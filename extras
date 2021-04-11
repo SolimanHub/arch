@@ -1,0 +1,26 @@
+#!/usr/bin/bash
+
+
+pacman -S lightdm lightdm-gtk-greeter --noconfirm
+
+rm /etc/lightdm/lightdm.conf
+mv lightdm.conf /etc/lightdm/
+
+systemctl enable lightdm.service
+
+# Otros servicios que se deben iniciar
+systemctl enable NetworkManager.service
+
+# Entorno de escritorio i3
+
+echo "1 2 3" | pacman -S i3 --noconfirm
+
+# Terminal
+
+pacman -S alacritty lxterminal --noconfirm 
+
+# mas
+
+pacman -S firefox git --noconfirm
+
+./yay

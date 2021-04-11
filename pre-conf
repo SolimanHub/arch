@@ -3,6 +3,9 @@
 cp configuracion /mnt
 cp conf2 /mnt
 cp grub /mnt
+cp extras /mnt
+cp lightdm.conf /mnt
+cp yay /mnt
 
 echo "====== ./configuracion ====="
 
