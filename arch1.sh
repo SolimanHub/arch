@@ -1,4 +1,0 @@
-
-
-loadkeys es
-

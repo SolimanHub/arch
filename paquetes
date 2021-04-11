@@ -3,3 +3,5 @@
 pacstrap /mnt base base-devel efibootmgr os-prober ntfs-3g networkmanager grub gvfs gvfs-afc gvfs-mtp xdg-user-dirs linux linux-firmware dhcpcd neovim netctl wpa_supplicant dialog xf86-input-synaptics
 
 genfstab -pU /mnt >> /mnt/etc/fstab
+
+./pre-conf

@@ -1,0 +1,18 @@
+#!/usr/bin/bash
+
+grub-install --efi-directory=/boot/efi --bootloader-id='Arch Linux' --target=x86_64-efi
+
+grub-mkconfig -o /boot/grub/grub.cfg
+
+echo "===== Contraseña root ====="
+passwd
+
+echo "===== Crear usuario:======"
+
+echo "useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner -s /bin/bash usuario"
+
+echo "===== Contraseña usuario:======"
+echo "passwd user"
+
+
+

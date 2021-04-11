@@ -3,4 +3,6 @@
 cp configuracion /mnt
 cp conf2 /mnt
 
+echo "====== ./configuracion ====="
+
 arch-chroot /mnt

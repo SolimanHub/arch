@@ -3,3 +3,5 @@
 echo LANG=es_HN.UTF-8 > /etc/locale.conf
 locale-gen
 hwclock -w
+
+./grub
