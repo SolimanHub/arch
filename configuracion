@@ -1,0 +1,14 @@
+#!/usr/bin/bash
+
+arch-chroot /mnt
+
+echo dse-pc > /etc/hostname
+ln -sf /usr/share/zoneinfo/America/Tegucigalpa /etc/localtime
+
+nvim /etc/locale.gen
+
+echo LANG=es_HN.UTF-8 > /etc/locale.conf
+
+hwclock -w
+
+
