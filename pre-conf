@@ -1,0 +1,6 @@
+#!/usr/bin/bash
+
+cp configuracion /mnt
+cp conf2 /mnt
+
+arch-chroot /mnt
