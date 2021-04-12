@@ -7,6 +7,6 @@ cp extras /mnt
 cp lightdm.conf /mnt
 cp yay /mnt
 
-echo "====== ./configuracion ====="
+echo "====== ./conf ====="
 
 arch-chroot /mnt
