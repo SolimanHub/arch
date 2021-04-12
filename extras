@@ -23,4 +23,4 @@ pacman -S alacritty lxterminal --noconfirm
 
 pacman -S firefox git --noconfirm
 
-./yay
+#./yay

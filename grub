@@ -13,5 +13,4 @@ echo "useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,sc
 echo "===== Contraseña usuario:======"
 echo "passwd user"
 
-
-
+echo "./extras"

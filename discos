@@ -2,11 +2,11 @@
 
 (
 echo o
-echo n
-echo p
-echo
-echo
-echo +100M
+#echo n
+#echo p
+#echo
+#echo
+#echo +100M
 echo n
 echo p
 echo
@@ -17,14 +17,14 @@ echo w
 
 echo "======Formateando particiones IFI, / ======"
 
-mkfs.vfat -F32 /dev/sda1
-mkfs.ext4 /dev/sda2
+#mkfs.vfat -F32 /dev/sda1
+mkfs.ext4 /dev/sda1
 
 echo "=====Montando unidades======="
 
-mount /dev/sda2 /mnt
-mkdir -p /mnt/boot/efi
+mount /dev/sda1 /mnt
+#mkdir -p /mnt/boot/efi
 
-mount /dev/sda1 /mnt/boot/efi
+#mount /dev/sda1 /mnt/boot/efi
 
 ./paquetes
