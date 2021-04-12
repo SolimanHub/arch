@@ -8,9 +8,10 @@ passwd
 
 echo "===== Crear usuario:======"
 
-echo "useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner -s /bin/bash usuario"
+#echo "useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner -s /bin/bash usuario"
 
+useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner -s /bin/bash dse && passwd dse
 echo "===== Contraseña usuario:======"
-echo "passwd user"
+#echo "passwd user"
 
 echo "./extras"

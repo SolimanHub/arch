@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 
-pacman -S lightdm lightdm-gtk-greeter --noconfirm
+pacman -S xorg-server lightdm lightdm-gtk-greeter --noconfirm
 
 rm /etc/lightdm/lightdm.conf
 mv lightdm.conf /etc/lightdm/
