@@ -24,11 +24,11 @@ ejecute los siguientes comandos en orden:
 - `pacman -S git` ( si este le muestra error, volver a ejecutarlo)
 - `git clone https://github.com/SolimanHub/arch`
 - `cd arch`
-- `./main` (este tomará tiempo)
-- `./conf`
+- `./main` (T = este tomará tiempo)
+- `./conf` (T)
 - Introduzca la contraseña del root
-- Introduzca la contraseña del usuario (se crea un usuario llamado ”dse” por defecto, esto se puede modificar en el archivo llamado <u>grub</u>, buscar dse y reemplazarlo por su nombre)
-- `exit`
+- Introduzca nombre del nuevo usuario
+- Introduzca la contraseña del usuario
 - reiniciar sistema desde el disco
 
 

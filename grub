@@ -6,12 +6,13 @@ grub-mkconfig -o /boot/grub/grub.cfg
 echo "===== Contraseña root ====="
 passwd
 
-echo "===== Crear usuario:======"
+echo "===== Crear usuario: ======"
+echo "Nombre de Usuario:"
+read usuario
 
-#echo "useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner -s /bin/bash usuario"
+useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner -s /bin/bash $usuario && passwd $usuario
 
-useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner -s /bin/bash dse && passwd dse
-echo "===== Contraseña usuario:======"
-#echo "passwd user"
+mkdir -p /home/$usuario/.config/i3
+mv /config /home/$usuario/.config/i3/
 
 echo "./extras"

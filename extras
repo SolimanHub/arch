@@ -9,7 +9,7 @@ mv lightdm.conf /etc/lightdm/
 systemctl enable lightdm.service
 
 # Otros servicios que se deben iniciar
-systemctl enable NetworkManager.service
+#systemctl enable NetworkManager.service
 
 # Entorno de escritorio i3
 
@@ -20,7 +20,8 @@ echo "1 2 3" | pacman -S i3 --noconfirm
 pacman -S alacritty lxterminal --noconfirm 
 
 # mas
+# firefox
+pacman -S git --noconfirm
 
-pacman -S firefox git --noconfirm
-
+exit
 #./yay
