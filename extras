@@ -20,8 +20,11 @@ echo "1 2 3" | pacman -S i3 --noconfirm
 pacman -S alacritty lxterminal --noconfirm 
 
 # mas
-# firefox
-pacman -S git --noconfirm
+
+pacman -S firefox git --noconfirm
+
+cd /
+rm conf conf2 grub extras yay
 
 exit
 #./yay

@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-cp configuracion /mnt
+cp conf /mnt
 cp conf2 /mnt
 cp grub /mnt
 cp extras /mnt
