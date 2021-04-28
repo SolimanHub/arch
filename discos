@@ -12,26 +12,32 @@ read unidad
 
 tamanio=$(fdisk -l | grep $unidad | grep bytes | cut -d ',' -f 3 | cut -d ' ' -f 2)
 
-#tamanio=$((tamanio/1024))
 home=$((tamanio/2))
 (
-#arranque del bios
+
+# arranque del bios
+# particion 1 
 echo o
 echo n
 echo p
 echo
 echo
 echo +1M
+
 # Formato Bios Boot
 echo t
 echo 4
+
 #home
+# particion 2
 echo n 		#nueva particion
 echo p 		#tipo particion
 echo		#nro de particion
 echo		#primer sector
 echo $home	#ultimo sector
+
 #raiz
+# particion 3
 echo n
 echo p
 echo
@@ -41,16 +47,15 @@ echo
 echo w
 ) | fdisk $unidad 
 
-echo "======Formateando particiones IFI, / ======"
+echo "======Formateando particiones ======"
 
-#mkfs.vfat -F32 /dev/sda1
 mkfs.ext4 "$unidad"2
+mkfs.ext4 "$unidad"3
 
 echo "=====Montando unidades======="
 
-mount "$unidad"2 /mnt
-#mkdir -p /mnt/boot/efi
-
-#mount /dev/sda1 /mnt/boot/efi
+mount "$unidad"3 /mnt
+mkdir -p /mnt/home
+mount "$unidad"2 /mnt/home
 
 #./paquetes
