@@ -1,5 +1,11 @@
 #!/usr/bin/bash
 
+echo "Discos disponibles para trabajar"
+echo "Seleccionar uno: /dev/sdX"
+
+fdisk -l | grep Disco | cut -d "," -f1
+# en unidad se debe escribir el nombre y direccion del disco "/dev/sdX
+read unidad
 (
 #arranque del bios
 echo o
@@ -18,7 +24,7 @@ echo
 
 #raiz
 echo w
-) | fdisk /dev/sda
+) | fdisk $unidad 
 
 echo "======Formateando particiones IFI, / ======"
 
