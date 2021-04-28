@@ -10,9 +10,9 @@ echo
 # en unidad se debe escribir el nombre y direccion del disco "/dev/sdX
 read unidad
 
-tamanio=$(fdisk -l | grep $unidad | grep bytes | cut -d ',' -f 2 | cut -d ' ' -f 2)
+tamanio=$(fdisk -l | grep $unidad | grep bytes | cut -d ',' -f 3 | cut -d ' ' -f 2)
 
-tamanio=$((tamanio/1024))
+#tamanio=$((tamanio/1024))
 home=$((tamanio/2))
 (
 #arranque del bios
@@ -24,7 +24,6 @@ echo
 echo +1M
 # Formato Bios Boot
 echo t
-echo 1
 echo 4
 #home
 echo n 		#nueva particion
