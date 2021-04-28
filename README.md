@@ -25,6 +25,8 @@ ejecute los siguientes comandos en orden:
 - `git clone https://github.com/SolimanHub/arch`
 - `cd arch`
 - `./main` (T = este tomará tiempo)
+- Se le muestran los discos disponibles, seleccione uno escribiendo su direccion completa (ejem `/dev/sdX`)
+    Se crearan 3 particiones raiz, home y una particion de 1M para la bios
 - `./conf` (T)
 - Introduzca la contraseña del root
 - Introduzca nombre del nuevo usuario
