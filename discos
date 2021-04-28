@@ -2,10 +2,18 @@
 
 echo "Discos disponibles para trabajar"
 echo "Seleccionar uno: /dev/sdX"
+echo 
+echo
 
-fdisk -l | grep Disco | cut -d "," -f1
+fdisk -l | grep Disk | cut -d "," -f1
+echo
 # en unidad se debe escribir el nombre y direccion del disco "/dev/sdX
 read unidad
+
+tamanio=$(fdisk -l | grep $unidad | grep bytes | cut -d ',' -f 2 | cut -d ' ' -f 2)
+
+home=$((tamanio/2))
+
 (
 #arranque del bios
 echo o
@@ -14,28 +22,36 @@ echo p
 echo
 echo
 echo +1M
+# Formato Bios Boot
+echo t
+echo 1
+echo 4
 #home
+echo n 		#nueva particion
+echo p 		#tipo particion
+echo		#nro de particion
+echo		#primer sector
+echo $home	#ultimo sector
+#raiz
 echo n
 echo p
 echo
+echo 
 echo
-echo
-#opt
 
-#raiz
 echo w
 ) | fdisk $unidad 
 
 echo "======Formateando particiones IFI, / ======"
 
 #mkfs.vfat -F32 /dev/sda1
-mkfs.ext4 /dev/sda1
+mkfs.ext4 "$unidad"2
 
 echo "=====Montando unidades======="
 
-mount /dev/sda1 /mnt
+mount "$unidad"2 /mnt
 #mkdir -p /mnt/boot/efi
 
 #mount /dev/sda1 /mnt/boot/efi
 
-./paquetes
+#./paquetes
