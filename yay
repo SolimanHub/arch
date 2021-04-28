@@ -1,18 +1,18 @@
 #!/usr/bin/bash
 
 cd /opt
-
 git clone https://aur.archlinux.org/yay.git
-
 cd yay/
 
 while IFS= read -r line
 do
   u="$line"
-done < user
+done < ../user
 
+chmod 777 PKGBUILD
+mv PKGBUILD /home/$u/
 su $u
-
+cd ~/
 makepkg -si
-
 exit
+rm -r /opt/*

@@ -21,7 +21,7 @@ pacman -S alacritty --noconfirm
 
 # mas
 
-pacman -S firefox git gparted dmenu feh picom py3status --noconfirm
+pacman -S go firefox git gparted dmenu feh picom py3status --noconfirm
 
 cd /
 rm conf conf2 grub extras 
