@@ -17,14 +17,14 @@ echo "1 2 3" | pacman -S i3 --noconfirm
 
 # Terminal
 
-pacman -S alacritty lxterminal --noconfirm 
+pacman -S alacritty --noconfirm 
 
 # mas
 
 pacman -S firefox git gparted dmenu feh picom --noconfirm
 
 cd /
-rm conf conf2 grub extras yay
+rm conf conf2 grub extras 
 
 exit
 #./yay

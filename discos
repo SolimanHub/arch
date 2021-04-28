@@ -1,17 +1,22 @@
 #!/usr/bin/bash
 
 (
+#arranque del bios
 echo o
-#echo n
-#echo p
-#echo
-#echo
-#echo +100M
+echo n
+echo p
+echo
+echo
+echo +1M
+#home
 echo n
 echo p
 echo
 echo
 echo
+#opt
+
+#raiz
 echo w
 ) | fdisk /dev/sda
 
