@@ -1,8 +1,8 @@
 #!/usr/bin/bash
 
-#pacstrap /mnt base base-devel efibootmgr networkmanager grub gvfs gvfs-afc gvfs-mtp xdg-user-dirs linux linux-firmware dhcpcd neovim netctl wpa_supplicant dialog xf86-input-synaptics
+pacstrap /mnt base base-devel efibootmgr networkmanager grub gvfs gvfs-afc gvfs-mtp xdg-user-dirs linux linux-firmware dhcpcd neovim netctl wpa_supplicant dialog xf86-input-synaptics
 
-pacstrap /mnt base grub linux linux-firmware neovim
+#pacstrap /mnt base grub linux linux-firmware neovim
 
 genfstab -pU /mnt >> /mnt/etc/fstab
 

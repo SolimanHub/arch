@@ -10,6 +10,9 @@ echo "===== Crear usuario: ======"
 echo "Nombre de Usuario:"
 read usuario
 
+#crea un archivo user, se usa en extras
+echo $usuario > /opt/user
+
 useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner -s /bin/bash $usuario && passwd $usuario
 
 mkdir -p /home/$usuario/.config/i3

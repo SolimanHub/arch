@@ -21,10 +21,21 @@ pacman -S alacritty --noconfirm
 
 # mas
 
-pacman -S firefox git gparted dmenu feh picom --noconfirm
+pacman -S firefox git gparted dmenu feh picom py3status --noconfirm
 
 cd /
 rm conf conf2 grub extras 
+cd /opt
+git clone https://github.com/SolimanHub/i3wn.git
 
-exit
-#./yay
+while IFS= read -r line
+do
+  u="$line"
+done < user
+
+rm /home/$u/.config/i3/config
+mv i3wn/config /home/$u/.config/i3/
+rm -rf i3wn
+
+./yay
+
