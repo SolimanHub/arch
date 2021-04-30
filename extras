@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
+# dar permisos de sudo al nuevo usuario
+sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL' /etc/sudoers
 
 pacman -S xorg-server lightdm lightdm-gtk-greeter --noconfirm
 
