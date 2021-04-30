@@ -1,7 +1,6 @@
 #!/usr/bin/bash
 
 # dar permisos de sudo al nuevo usuario
-sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL' /etc/sudoers
 
 pacman -S xorg-server lightdm lightdm-gtk-greeter --noconfirm
 
@@ -27,17 +26,6 @@ pacman -S go firefox git gparted dmenu feh picom py3status --noconfirm
 
 cd /
 rm conf conf2 grub extras 
-cd /opt
-git clone https://github.com/SolimanHub/i3wn.git
 
-while IFS= read -r line
-do
-  u="$line"
-done < user
-
-rm /home/$u/.config/i3/config
-mv i3wn/config /home/$u/.config/i3/
-rm -rf i3wn
-
-./yay
+./gits
 
