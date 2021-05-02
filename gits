@@ -21,6 +21,18 @@ ln -s /home/$u/.config/bashrc/.bashrc /home/$u/.bashrc
 ln -s /home/$u/.config/bashrc/.bashrc /root/.bashrc
 source /home/$u/.config/bashrc/.bashrc
 
+# Cargar carpeta script /opt
+git clone https://github.com/solimanhub/scripts.git
+mv scripts script
+
+# Configurar neovim
+cd /home/$u/.config
+git clone https://github.com/SolimanHub/nvim.git
+mkdir plugged/
+sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+su $u
+sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+exit
 
 # Configurar AUR
 git clone https://aur.archlinux.org/yay.git
@@ -38,4 +50,8 @@ cd ~/
 echo "===== Contrase;a de Root ====="
 makepkg -si
 exit
+
+rm -r /root/.config/
+cp -r /home/$u/.config/ /root/
+
 rm -r /opt/*
