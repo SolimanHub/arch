@@ -14,6 +14,11 @@ rm /home/$u/.config/i3/config
 mv i3wn/config /home/$u/.config/i3/
 rm -rf i3wn
 
+
+# Comando ves
+git clone https://github.com/SolimanHub/comando_ves.git
+ln -s /opt/comando_ves/ves /usr/bin/ves
+
 # Configurar Bashrc
 git clone https://github.com/SolimanHub/bashrc.git
 mv bashrc /home/$u/.config/
