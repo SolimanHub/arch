@@ -28,8 +28,16 @@ echo +1M
 echo t
 echo 4
 
-#home
+# EFI
 # particion 2
+echo n
+echo p
+echo
+echo
+echo +100M
+
+#home
+# particion 3
 echo n 		#nueva particion
 echo p 		#tipo particion
 echo		#nro de particion
@@ -37,7 +45,7 @@ echo		#primer sector
 echo $home	#ultimo sector
 
 #raiz
-# particion 3
+# particion 4
 echo n
 echo p
 echo
@@ -49,14 +57,17 @@ echo w
 
 echo "======Formateando particiones ======"
 
-mkfs.ext4 "$unidad"2
+mkfs.fat -F32 "$unidad"2
 mkfs.ext4 "$unidad"3
+mkfs.ext4 "$unidad"4
 
 echo "=====Montando unidades======="
 
-mount "$unidad"3 /mnt
+mount "$unidad"4 /mnt
 mkdir -p /mnt/home
-mount "$unidad"2 /mnt/home
+mount "$unidad"3 /mnt/home
+mkdir -p /mnt/boot/EFI
+mount "$unidad"2 /mnt/boot/EFI
 
 echo " Instalar paquetes "
 ./paquetes
