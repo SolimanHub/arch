@@ -1,5 +1,8 @@
 #!/usr/bin/bash
 
+
+echo
+echo
 echo "Discos disponibles para trabajar"
 echo "Seleccionar uno: /dev/sdX"
 echo 
@@ -9,6 +12,14 @@ fdisk -l | grep Dis | cut -d "," -f1
 echo
 # en unidad se debe escribir el nombre y direccion del disco "/dev/sdX
 read unidad
+
+
+echo
+echo
+echo "¿Crear SWAP? [S/N]"
+read swap
+echo 
+echo
 
 tamanio=$(fdisk -l | grep $unidad | grep bytes | cut -d ',' -f 3 | cut -d ' ' -f 2)
 
@@ -44,6 +55,19 @@ echo		#nro de particion
 echo		#primer sector
 echo $home	#ultimo sector
 
+if [ $swap = "S" ] || [ $swap = "s" ]
+then
+	echo n
+	echo p
+	echo
+	echo
+	echo +8G
+	
+	echo t
+	echo 4
+	echo 82
+fi
+
 #raiz
 # particion 4
 echo n
@@ -57,17 +81,36 @@ echo w
 
 echo "======Formateando particiones ======"
 
+if [ $swap = "S" ] || [ $swap = "s" ]
+then
+	mkswap "$unidad"4
+	swapon "$unidad"4
+	mkfs.ext4 "$unidad"5
+else
+	mkfs.ext4 "$unidad"4
+fi
+
 mkfs.fat -F32 "$unidad"2
 mkfs.ext4 "$unidad"3
-mkfs.ext4 "$unidad"4
 
 echo "=====Montando unidades======="
 
-mount "$unidad"4 /mnt
+if [ $swap = "S" ] || [ $swap = "s" ]
+then
+	mount "$unidad"5 /mnt
+	echo "/mnt montado"
+else
+	mount "$unidad"4 /mnt
+	echo "/mnt montado"
+fi
 mkdir -p /mnt/home
 mount "$unidad"3 /mnt/home
+echo "home montado"
 mkdir -p /mnt/boot/EFI
 mount "$unidad"2 /mnt/boot/EFI
+echo "EFI montado"
+echo
+echo
 
 echo " Instalar paquetes "
 ./paquetes

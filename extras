@@ -22,10 +22,12 @@ pacman -S alacritty --noconfirm
 
 # mas
 
-pacman -S network-manager-applet networkmanager-openvpn nm-connection-editor wget curl meld pulseaudio pulseaudio-bluetooth pavucontrol go firefox git gparted dmenu feh picom py3status --noconfirm
+pacman -S dmenu feh picom py3status --noconfirm
+
+#pacman -S network-manager-applet networkmanager-openvpn nm-connection-editor wget curl meld pulseaudio pulseaudio-bluetooth pavucontrol go firefox git gparted dmenu feh picom py3status --noconfirm
 
 cd /
 rm conf conf2 grub extras 
 
-./gits
+#./gits
 
