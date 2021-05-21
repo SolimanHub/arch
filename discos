@@ -18,6 +18,11 @@ echo
 echo
 echo "¿Crear SWAP? [S/N]"
 read swap
+if [ $swap = "S" ] || [ $swap = "s" ]
+then
+	echo "Defina el tamaño de la particion [ejem: 2G]"
+	read tam_swap
+fi
 echo 
 echo
 
@@ -47,35 +52,57 @@ echo
 echo
 echo +100M
 
-#home
-# particion 3
-echo n 		#nueva particion
-echo p 		#tipo particion
-echo		#nro de particion
-echo		#primer sector
-echo $home	#ultimo sector
-
 if [ $swap = "S" ] || [ $swap = "s" ]
 then
+	# swap
+	# p3
 	echo n
 	echo p
 	echo
 	echo
-	echo +8G
+	echo +$tam_swap
 	
 	echo t
 	echo 4
 	echo 82
+	
+	# particion extendida
+	# particion 4
+	echo n
+	echo e
+	echo 
+	echo
+	echo
+
+	#home
+	#p5
+	echo n
+	echo
+	echo $home
+
+	#raiz
+	#p6
+	echo n
+	echo
+	echo
+else
+
+	#home
+	# particion 3
+	echo n 		#nueva particion
+	echo p 		#tipo particion
+	echo		#nro de particion
+	echo		#primer sector
+	echo $home	#ultimo sector
+
+	#raiz
+	# particion 4 
+	echo n
+	echo p
+	echo
+	echo 
+	echo
 fi
-
-#raiz
-# particion 4
-echo n
-echo p
-echo
-echo 
-echo
-
 echo w
 ) | fdisk $unidad 
 
@@ -83,32 +110,39 @@ echo "======Formateando particiones ======"
 
 if [ $swap = "S" ] || [ $swap = "s" ]
 then
-	mkswap "$unidad"4
-	swapon "$unidad"4
+	mkswap "$unidad"3
+	swapon "$unidad"3
+	#particion 4 es extendida
 	mkfs.ext4 "$unidad"5
+	mkfs.ext4 "$unidad"6
 else
+	mkfs.ext4 "$unidad"3
 	mkfs.ext4 "$unidad"4
 fi
 
 mkfs.fat -F32 "$unidad"2
-mkfs.ext4 "$unidad"3
 
 echo "=====Montando unidades======="
 
+echo "creando directorio home ..."
+mkdir -p /mnt/home
+echo "creando directorio EFI ..."
+mkdir -p /mnt/boot/EFI
+
 if [ $swap = "S" ] || [ $swap = "s" ]
 then
-	mount "$unidad"5 /mnt
-	echo "/mnt montado"
+	echo "/mnt montando ... "
+	mount "$unidad"6 /mnt
+	echo "montando home ..."
+	mount "$unidad"5 /mnt/home
 else
+	echo "/mnt montando ... "
 	mount "$unidad"4 /mnt
-	echo "/mnt montado"
+	echo "montando home ..."
+	mount "$unidad"3 /mnt/home
 fi
-mkdir -p /mnt/home
-mount "$unidad"3 /mnt/home
-echo "home montado"
-mkdir -p /mnt/boot/EFI
+echo "montando EFI ..."
 mount "$unidad"2 /mnt/boot/EFI
-echo "EFI montado"
 echo
 echo
 
