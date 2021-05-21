@@ -63,7 +63,7 @@ then
 	echo +$tam_swap
 	
 	echo t
-	echo 4
+	echo 3
 	echo 82
 	
 	# particion extendida
