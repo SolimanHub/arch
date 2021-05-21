@@ -1,3 +1,6 @@
+# Importante
+Este script no es utilizable por el momento, si desea utilizarlo recuerde marcar "no" cuando le pregunte si desea crear una particion swap, de lo contrario su instalacion no sera de utilidad.
+
 # Instalación sencilla de ArchLinux
 
 > Nota importante: esta instalación de ArchLinux es recomendable para máquinas virtuales, dado que está configurada con BIOS, realiza un formateo total del disco, crea una sola partición ext4 (sin swap, sin home …)
