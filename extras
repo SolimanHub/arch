@@ -8,17 +8,24 @@ rm /etc/lightdm/lightdm.conf
 mv lightdm.conf /etc/lightdm/
 
 systemctl enable lightdm.service
+systemctl enable NetworkManager
 
 # Otros servicios que se deben iniciar
 #systemctl enable NetworkManager.service
 
 # Entorno de escritorio i3
+pacman -S xfce4
+pacman -S xfwm4 xfce4-panel xfdesktop thunar xfce4-session xfce4-settings xfce4-appfinder xfce-utils xfconf
+pacman -S xfce4-goodies
+pacman -S gstreamer0.10-base-plugins
+pacman -S dbus
+pacman -S gtk-engines gtk-engine-murrine gnome-themes-standard
 
 echo "1 2 3" | pacman -S i3 --noconfirm
 
 # Terminal
 
-pacman -S alacritty --noconfirm 
+pacman -S alacritty network-manager-applet  --noconfirm 
 
 # mas
 
