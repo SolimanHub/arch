@@ -1,5 +1,10 @@
 #!/usr/bin/bash
 
+echo "Recomiendo hacer el particionado de discos de forma manual"
+echo "Para tener una referencia de que manera realizar dicho particionado"
+echo "Puede leer el codigo del archivo 'discos'"
+echo
+echo 
 
 echo
 echo
@@ -8,7 +13,8 @@ echo "Seleccionar uno: /dev/sdX"
 echo 
 echo
 
-fdisk -l | grep Dis | cut -d "," -f1
+fdisk -l | grep Dis | grep /dev/sd | cut -d "," -f1 | cut -d " " -f2,3,4
+#fdisk -l | grep Dis | cut -d "," -f1
 echo
 # en unidad se debe escribir el nombre y direccion del disco "/dev/sdX
 read unidad
