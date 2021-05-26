@@ -1,6 +1,7 @@
 #!/usr/bin/bash
 set -e -u
 
+cp user_conf /mnt
 cp conf /mnt
 cp grub /mnt
 cp inss /mnt

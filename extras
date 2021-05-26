@@ -4,7 +4,7 @@ cd /
 # while para saber el tipo de instalacion elegida en el archivo paquetes
 while IFS= read -r line
 do
-  i="Sline"
+  i="$line"
 done < inss
 pacman -S xorg-server lightdm lightdm-gtk-greeter networkmanager --noconfirm
 # cargando configuracion de lightdm
@@ -15,7 +15,7 @@ systemctl enable lightdm.service
 systemctl enable NetworkManager
 #Escritorio xfce4
 echo "all" | pacman -S xfce4 --noconfirm
-echo "all" | pacman -S xfce4-goodies --noconfim
+echo "all" | pacman -S xfce4-goodies --noconfirm
 pacman -S dbus --noconfirm
 pacman -S gtk-engines gtk-engine-murrine gnome-themes-standard --noconfirm
 # cargando paquete de iconos
@@ -38,9 +38,10 @@ ln -s /opt/comando_ves/ves /usr/bin/ves
 # recordamos el nombre de usuario 
 while IFS= read -r line
 do
-  u="Sline"
+  u="$line"
 done < user
 rm /opt/user
+chmod 777 /user_conf
 # iniciamos como el nuevo usuario
 su $u
 yay -S pop-gtk-theme
