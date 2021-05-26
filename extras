@@ -6,7 +6,7 @@ while IFS= read -r line
 do
   i="Sline"
 done < inss
-pacman -S xorg-server lightdm lightdm-gtk-greeter --noconfirm
+pacman -S xorg-server lightdm lightdm-gtk-greeter networkmanager --noconfirm
 # cargando configuracion de lightdm
 rm /etc/lightdm/lightdm.conf
 mv lightdm.conf /etc/lightdm/
@@ -14,7 +14,9 @@ mv lightdm.conf /etc/lightdm/
 systemctl enable lightdm.service
 systemctl enable NetworkManager
 #Escritorio xfce4
-pacman -S xfce4 xfce4-goodies gstreamer0.10-base-plugins dbus --noconfirm
+echo "all" | pacman -S xfce4 --noconfirm
+echo "all" | pacman -S xfce4-goodies --noconfim
+pacman -S dbus --noconfirm
 pacman -S gtk-engines gtk-engine-murrine gnome-themes-standard --noconfirm
 # cargando paquete de iconos
 mv Luv /usr/share/icons/
@@ -27,7 +29,7 @@ pacman -S gstreamer gst-libav gst-plugins-bad gst-plugins-base gst-plugins-good 
 # AUR
 pacman -U Paquetes/yay-10.2.2-2-x86_64.pkg.tar.zst --noconfirm
 # eliminados archivos importados del git arch
-rm conf conf3 grub extras inss
+rm conf grub extras inss
 rm -r Paquetes
 cd /opt
 # comando ves carga y configuracion
