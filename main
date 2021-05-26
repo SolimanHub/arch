@@ -2,4 +2,18 @@
 
 loadkeys es
 
-./discos
+echo "Recomiendo hacer el particionado de discos de forma manual"
+echo "para tener una referencia de como utilizar el comando fdisk"
+echo "puede ver el codigo del archivo llamado 'discos'"
+echo
+echo "¿Desea hacer el particionado manual? [S/N]"
+
+read respuesta
+
+if [ $respuesta = "S" ] || [ $respuesta = "s" ] || [ $respuesta = "" ]
+then
+  echo "EXCELENTE eleccion, al finalizar ejecute el script ./paquetes"
+else
+  ./discos
+fi
+

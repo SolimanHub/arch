@@ -18,6 +18,7 @@ echo
 echo
 echo "¿Crear SWAP? [S/N]"
 read swap
+
 if [ $swap = "S" ] || [ $swap = "s" ]
 then
 	echo "Defina el tamaño de la particion [ejem: 2G]"
