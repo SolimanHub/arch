@@ -1,4 +1,5 @@
 #!/usr/bin/bash
+set -e -u
 
 # Configuraciones tomadas de repos git
 

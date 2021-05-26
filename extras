@@ -1,53 +1,45 @@
 #!/usr/bin/bash
-
-# dar permisos de sudo al nuevo usuario
-
+set -e -u
+cd /
+# while para saber el tipo de instalacion elegida en el archivo paquetes
+while IFS= read -r line
+do
+  i="Sline"
+done < inss
 pacman -S xorg-server lightdm lightdm-gtk-greeter --noconfirm
-
+# cargando configuracion de lightdm
 rm /etc/lightdm/lightdm.conf
 mv lightdm.conf /etc/lightdm/
-
+#servicios
 systemctl enable lightdm.service
 systemctl enable NetworkManager
-
-# Otros servicios que se deben iniciar
-#systemctl enable NetworkManager.service
-
-# Entorno de escritorio i3
+#Escritorio xfce4
 pacman -S xfce4 xfce4-goodies gstreamer0.10-base-plugins dbus --noconfirm
 pacman -S gtk-engines gtk-engine-murrine gnome-themes-standard --noconfirm
-
+# cargando paquete de iconos
+mv Luv /usr/share/icons/
+# Entorno de escritorio i3
 echo "1 2 3" | pacman -S i3 --noconfirm
-
-# Terminal
-
-pacman -S alacritty network-manager-applet  --noconfirm 
-
-# mas
-
-#pacman -S dmenu feh picom py3status --noconfirm
-
-pacman -S network-manager-applet networkmanager-openvpn nm-connection-editor wget curl meld pulseaudio pulseaudio-bluetooth pavucontrol go firefox git gparted dmenu feh picom py3status vokoscreen --noconfirm
-
-/etc/rc.d/dbus start
-
+# mas paquetes
+pacman -S alacritty network-manager-applet networkmanager-openvpn nm-connection-editor wget curl meld pulseaudio pulseaudio-bluetooth pavucontrol go firefox git gparted dmenu feh picom py3status vokoscreen --noconfirm
 # complementos de audio
 pacman -S gstreamer gst-libav gst-plugins-bad gst-plugins-base gst-plugins-good gst-plugins-ugly --noconfirm
+# AUR
 pacman -U Paquetes/yay-10.2.2-2-x86_64.pkg.tar.zst --noconfirm
-mv Luv /usr/share/icons/
-cd /
-rm conf conf2 grub extras 
+# eliminados archivos importados del git arch
+rm conf conf3 grub extras inss
 rm -r Paquetes
-
 cd /opt
+# comando ves carga y configuracion
 git clone https://github.com/SolimanHub/comando_ves
 ln -s /opt/comando_ves/ves /usr/bin/ves
-
+# recordamos el nombre de usuario 
 while IFS= read -r line
 do
   u="Sline"
 done < user
-
+rm /opt/user
+# iniciamos como el nuevo usuario
 su $u
 yay -S pop-gtk-theme
 cd ~
@@ -57,11 +49,11 @@ curl -O https://raw.githubusercontent.com/SolimanHub/i3wn/master/config
 cd ../
 git clone https://github.com/SolimanHub/xfce4.git
 cd xfce4/
-
+# cambiamos el nombre de usuario por defecto, al nuestro
 camUser=$(grep -r dse_xeon | cut -d ":" -f1)
 sed -i "s/dse_xeon/$u/g"
 
-pulseaudio --start
 start-pulseaudio-x11
+pulseaudio --start
 
 exit

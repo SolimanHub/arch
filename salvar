@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e -u
 
 
 # checking if I have the latest files from github

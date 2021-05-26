@@ -1,4 +1,5 @@
 #!/usr/bin/bash
+set -e -u
 
 echo "Recomiendo hacer el particionado de discos de forma manual"
 echo "Para tener una referencia de que manera realizar dicho particionado"

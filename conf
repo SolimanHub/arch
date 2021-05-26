@@ -1,4 +1,5 @@
 #!/usr/bin/bash
+set -e -u
 
 echo dse-pc > /etc/hostname
 ln -sf /usr/share/zoneinfo/America/Tegucigalpa /etc/localtime
