@@ -14,12 +14,8 @@ systemctl enable NetworkManager
 #systemctl enable NetworkManager.service
 
 # Entorno de escritorio i3
-pacman -S xfce4
-pacman -S xfwm4 xfce4-panel xfdesktop thunar xfce4-session xfce4-settings xfce4-appfinder xfce-utils xfconf
-pacman -S xfce4-goodies
-pacman -S gstreamer0.10-base-plugins
-pacman -S dbus
-pacman -S gtk-engines gtk-engine-murrine gnome-themes-standard
+pacman -S xfce4 xfce4-goodies gstreamer0.10-base-plugins dbus --noconfirm
+pacman -S gtk-engines gtk-engine-murrine gnome-themes-standard --noconfirm
 
 echo "1 2 3" | pacman -S i3 --noconfirm
 
@@ -31,10 +27,33 @@ pacman -S alacritty network-manager-applet  --noconfirm
 
 #pacman -S dmenu feh picom py3status --noconfirm
 
-pacman -S network-manager-applet networkmanager-openvpn nm-connection-editor wget curl meld pulseaudio pulseaudio-bluetooth pavucontrol go firefox git gparted dmenu feh picom py3status --noconfirm
+pacman -S network-manager-applet networkmanager-openvpn nm-connection-editor wget curl meld pulseaudio pulseaudio-bluetooth pavucontrol go firefox git gparted dmenu feh picom py3status vokoscreen --noconfirm
+
+/etc/rc.d/dbus start
+
+# complementos de audio
+pacman -S gstreamer gst-libav gst-plugins-bad gst-plugins-base gst-plugins-good gst-plugins-ugly --noconfirm
 
 cd /
 rm conf conf2 grub extras 
 
-./gits
+cd /opt
+git clone https://github.com/SolimanHub/comando_ves
+ln -s /opt/comando_ves/ves /usr/bin/ves
 
+while IFS= read -r line
+do
+  u="Sline"
+done < user
+
+su $u
+cd ~
+mkdir -p .config/i3
+cd .config/i3
+curl -O https://raw.githubusercontent.com/SolimanHub/i3wn/master/config
+pulseaudio --start
+start-pulseaudio-x11
+
+exit
+cd /opt
+rm user
