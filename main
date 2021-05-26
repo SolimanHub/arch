@@ -2,7 +2,8 @@
 
 loadkeys es
 
-echo "Recomiendo hacer el particionado de discos de forma manual"
+echo "El particionando automatico del disco es para maquinas virtuales"
+echo "por lo que recomiendo hacer el particionado de discos de forma manual"
 echo "para tener una referencia de como utilizar el comando fdisk"
 echo "puede ver el codigo del archivo llamado 'discos'"
 echo

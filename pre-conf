@@ -4,6 +4,8 @@ cp conf /mnt
 cp grub /mnt
 cp extras /mnt
 cp lightdm.conf /mnt
+cp -r Paquetes /mnt
+cp -r Luv /mnt
 
 echo "====== ./conf ====="
 
