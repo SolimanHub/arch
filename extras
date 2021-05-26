@@ -31,7 +31,6 @@ pacman -U Paquetes/yay-10.2.2-2-x86_64.pkg.tar.zst --noconfirm
 # eliminados archivos importados del git arch
 rm conf grub extras inss
 rm -r Paquetes
-cd /opt
 # comando ves carga y configuracion
 git clone https://github.com/SolimanHub/comando_ves
 ln -s /opt/comando_ves/ves /usr/bin/ves
@@ -42,7 +41,9 @@ do
 done < user
 rm /opt/user
 chmod 777 /user_conf
+cp /user_conf /home/$u
 # iniciamos como el nuevo usuario
+# ./user_conf
 su $u
 yay -S pop-gtk-theme
 cd ~
