@@ -1,19 +1,11 @@
 #!/usr/bin/bash
 
-echo "Recomiendo hacer el particionado de discos de forma manual"
-echo "Para tener una referencia de que manera realizar dicho particionado"
-echo "Puede leer el codigo del archivo 'discos'"
-echo
-echo 
-
-echo
 echo
 echo "Discos disponibles para trabajar"
-echo "Seleccionar uno: /dev/sdX"
+echo "Seleccionar uno: sdX"
 echo 
-echo
 
-fdisk -l | grep Dis | grep /dev/sd | cut -d "," -f1 | cut -d " " -f2,3,4
+fdisk -l | grep Dis | grep /dev/sd | cut -d "," -f1 | cut -d " " -f2,3,4 | cut -d "/" -f3
 #fdisk -l | grep Dis | cut -d "," -f1
 echo
 # en unidad se debe escribir el nombre y direccion del disco "/dev/sdX
@@ -66,27 +58,26 @@ echo
 echo
 
 echo w
-) | fdisk $unidad 
+) | fdisk "/dev/"$unidad 
 
 echo "======Formateando particiones ======"
 
-mkfs.ext4 "$unidad"4
-mkfs.ext4 "$unidad"3
-mkfs.fat -F32 "$unidad"2
+mkfs.ext4 "/dev/"$unidad"4"
+mkfs.ext4 "/dev/"$unidad"3"
+mkfs.fat -F32 "/dev/"$unidad"2"
 
 echo "=====Montando unidades======="
 
-echo "creando directorio home ..."
-mkdir -p /mnt/home
-echo "creando directorio EFI ..."
-mkdir -p /mnt/boot/EFI
 
 echo "/mnt montando ... "
-mount "$unidad"4 /mnt
+mount "/dev/"$unidad"4" /mnt
+echo "creando directorio home ..."
+mkdir -p /mnt/home
 echo "montando home ..."
-mount "$unidad"3 /mnt/home
+mount "/dev/"$unidad"3" /mnt/home
+echo "creando directorio EFI ..."
+mkdir -p /mnt/boot/EFI
 echo "montando EFI ..."
-mount "$unidad"2 /mnt/boot/EFI
+mount "/dev/"$unidad"2" /mnt/boot/EFI
 echo
-echo " Instalar paquetes "
 ./paquetes
