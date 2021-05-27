@@ -2,6 +2,7 @@
 set -i -u
 
 cd ~
+xdg-user-dirs-update
 yay -S pop-gtk-theme
 mkdir -p .config/i3
 cd .config/i3
