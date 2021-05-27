@@ -43,9 +43,8 @@ Eso seria todo, ahora solo basta elegir usar i3 (recomendado para desarrolladore
 
 Introducir su contraseña y listo ;)
 
-
-
-Ahora su ArchLinux está instalado, esta configuración no es recomendable para un novato dado que tiene un gestor de ventanas, i3 para ser específico, usted puede cambiar este por un gestor de escritorio de su preferencia en el archivo llamado <u>extras</u>.
-
 Este Script facilita el proceso de instalación y puede ser utilizado sin inconveniente, pero esta incompleto, por lo cual aún puede ser difícil de manejar para algunos usuarios, esto será corregido algun dia xD
 
+## Dudas o sugerencias 
+
+    Telegram: @Obumbrata
