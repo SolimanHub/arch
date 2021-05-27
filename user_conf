@@ -1,8 +1,8 @@
 #!/usr/bin/bash
 set -i -u
 
-yay -S pop-gtk-theme
 cd ~
+yay -S pop-gtk-theme
 mkdir -p .config/i3
 cd .config/i3
 curl -O https://raw.githubusercontent.com/SolimanHub/i3wn/master/config
@@ -11,3 +11,6 @@ git clone https://github.com/SolimanHub/xfce4.git
 cd xfce4/
 old_user=$(grep -r dse_xeon | cut -d ":" -f1)
 sed -i "s/dse_xeon/$whoami/g" $old_user
+
+start-pulseaudio-x11
+pulseaudio --start
