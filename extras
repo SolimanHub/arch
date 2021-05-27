@@ -1,7 +1,8 @@
 #!/usr/bin/bash
 set -e -u
 cd /
-# while para saber el tipo de instalacion elegida en el archivo paquetes
+# actualizando las bases para evitar errores
+pacman -Syy
 pacman -S xorg-server lightdm lightdm-gtk-greeter networkmanager --noconfirm
 # cargando configuracion de lightdm
 rm /etc/lightdm/lightdm.conf
