@@ -1,19 +1,8 @@
 #!/usr/bin/bash
 set -e -u
 
-echo "ahora se realizara la instalacion inicial de paquetes, ¿que tipo de instalacion desea hacer?"
-echo "1.- Basica (recomendada para MV) default*"
-echo "2.- Extendida"
-read instalacion
+pacstrap /mnt base base-devel efibootmgr networkmanager grub gvfs gvfs-afc gvfs-mtp xdg-user-dirs linux linux-firmware dhcpcd neovim netctl wpa_supplicant dialog xf86-input-synaptics
 
-if [ $instalacion = "2"]
-then
-  pacstrap /mnt base base-devel efibootmgr networkmanager grub gvfs gvfs-afc gvfs-mtp xdg-user-dirs linux linux-firmware dhcpcd neovim netctl wpa_supplicant dialog xf86-input-synaptics
-else
-  pacstrap /mnt base grub linux linux-firmware neovim
-fi
-
-echo $instalacion > inss
 genfstab -pU /mnt >> /mnt/etc/fstab
 
 ./pre-conf

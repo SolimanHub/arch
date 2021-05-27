@@ -5,7 +5,6 @@ cp sudoers /mnt
 cp user_conf /mnt
 cp conf /mnt
 cp grub /mnt
-cp inss /mnt
 cp extras /mnt
 cp lightdm.conf /mnt
 cp -r Paquetes /mnt
