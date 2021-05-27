@@ -1,12 +1,10 @@
 #!/usr/bin/bash
-#set -e -u
 
+mv /sudoers /etc/
 echo dse-pc > /etc/hostname
 ln -sf /usr/share/zoneinfo/America/Tegucigalpa /etc/localtime
 
 echo "es_HN.UTF-8 UTF-8" >> /etc/locale.gen
-
-sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /etc/sudoers
 
 echo LANG=es_HN.UTF-8 > /etc/locale.conf
 locale-gen

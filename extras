@@ -28,6 +28,7 @@ pacman -S alacritty network-manager-applet networkmanager-openvpn nm-connection-
 pacman -S gstreamer gst-libav gst-plugins-bad gst-plugins-base gst-plugins-good gst-plugins-ugly --noconfirm
 # AUR
 pacman -U Paquetes/yay-10.2.2-2-x86_64.pkg.tar.zst --noconfirm
+pacman -U Paquetes/pop-gtk-theme-5.3.3-1-any.pkg.tar.zst -noconfirm
 # eliminados archivos importados del git arch
 rm conf grub extras inss
 rm -r Paquetes
