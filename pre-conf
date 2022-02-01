@@ -9,6 +9,7 @@ cp extras /mnt
 cp lightdm.conf /mnt
 cp -r Paquetes /mnt
 cp -r Luv /mnt
+cp -r fonts/ /mnt
 
 echo "====== ./conf ====="
 
