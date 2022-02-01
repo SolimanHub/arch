@@ -20,7 +20,7 @@ mv Luv /usr/share/icons/
 # Entorno de escritorio i3
 echo "1 2 3" | pacman -S i3 --noconfirm
 # mas paquetes
-pacman -S alacritty network-manager-applet networkmanager-openvpn nm-connection-editor wget curl meld pulseaudio pulseaudio-bluetooth pavucontrol go firefox git gparted dmenu feh picom py3status vokoscreen --noconfirm
+pacman -S alacritty network-manager-applet networkmanager-openvpn nm-connection-editor wget curl meld pulseaudio pulseaudio-bluetooth pavucontrol go firefox git gparted dmenu feh picom py3status vokoscreen pulsemixer --noconfirm
 # complementos de audio
 pacman -S gstreamer gst-libav gst-plugins-bad gst-plugins-base gst-plugins-good gst-plugins-ugly --noconfirm
 # AUR

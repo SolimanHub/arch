@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 set -e -u
 
-pacstrap /mnt base base-devel efibootmgr networkmanager grub gvfs gvfs-afc gvfs-mtp xdg-user-dirs linux linux-firmware dhcpcd neovim netctl wpa_supplicant dialog acpi polybar i3-gaps xf86-input-synaptics
+pacstrap /mnt base base-devel efibootmgr networkmanager grub gvfs gvfs-afc gvfs-mtp xdg-user-dirs linux linux-firmware dhcpcd neovim netctl wpa_supplicant dialog acpi polybar i3-gaps xf86-input-synaptics bluez bluez-utils
 
 genfstab -pU /mnt >> /mnt/etc/fstab
 
