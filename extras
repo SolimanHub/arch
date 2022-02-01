@@ -7,6 +7,8 @@ pacman -S xorg-server lightdm lightdm-gtk-greeter networkmanager --noconfirm
 # cargando configuracion de lightdm
 rm /etc/lightdm/lightdm.conf
 mv lightdm.conf /etc/lightdm/
+# configuracion para el touchpad
+mv 50-synaptics.conf /etc/X11/xorg.conf.d/
 #servicios
 systemctl enable lightdm.service
 systemctl enable NetworkManager
