@@ -28,7 +28,7 @@ echo "1 2 3" | pacman -S i3 --noconfirm
 # mas paquetes
 pacman -S brightnessctl alacritty network-manager-applet networkmanager-openvpn nm-connection-editor wget curl meld pulseaudio pulseaudio-bluetooth pavucontrol go firefox git gparted dmenu feh picom py3status vokoscreen pulsemixer --noconfirm
 # complementos de audio
-pacman -S nodejs npm
+pacman -S nodejs npm evince
 pacman -S gstreamer gst-libav gst-plugins-bad unzip gst-plugins-base gst-plugins-good gst-plugins-ugly --noconfirm
 # AUR
 pacman -U Paquetes/yay-10.2.2-2-x86_64.pkg.tar.zst --noconfirm
