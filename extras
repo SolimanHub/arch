@@ -16,20 +16,17 @@ rm -r fonts/
 systemctl enable lightdm.service
 systemctl enable NetworkManager
 systemctl enable bluetooth.service
+
 #Escritorio xfce4
 echo "all" | pacman -S xfce4 --noconfirm
 echo "all" | pacman -S xfce4-goodies --noconfirm
-pacman -S dbus sudo --noconfirm
-pacman -S gtk-engines gtk-engine-murrine gnome-themes-standard --noconfirm
+pacman -S dbus sudo gtk-engines gtk-engine-murrine gnome-themes-standard --noconfirm
 # cargando paquete de iconos
 mv Luv /usr/share/icons/
 # Entorno de escritorio i3
 echo "1 2 3" | pacman -S i3 --noconfirm
 # mas paquetes
-pacman -S brightnessctl alacritty network-manager-applet networkmanager-openvpn nm-connection-editor wget curl meld pulseaudio pulseaudio-bluetooth pavucontrol go firefox git gparted dmenu feh picom py3status vokoscreen pulsemixer --noconfirm
-# complementos de audio
-pacman -S nodejs npm evince
-pacman -S gstreamer gst-libav gst-plugins-bad unzip gst-plugins-base gst-plugins-good gst-plugins-ugly --noconfirm
+pacman -S brightnessctl alacritty network-manager-applet networkmanager-openvpn nm-connection-editor wget curl meld pulseaudio pulseaudio-bluetooth pulseaudio-alsa pavucontrol go firefox git gparted dmenu feh picom py3status vokoscreen pulsemixer nodejs npm evince gstreamer gst-libav gst-plugins-bad unzip gst-plugins-base gst-plugins-good gst-plugins-ugly --noconfirm
 # AUR
 pacman -U Paquetes/yay-10.2.2-2-x86_64.pkg.tar.zst --noconfirm
 pacman -U Paquetes/pop-gtk-theme-5.3.3-1-any.pkg.tar.zst --noconfirm
