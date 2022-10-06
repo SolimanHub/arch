@@ -2,6 +2,7 @@
 set -e -u
 
 cp sudoers /mnt
+cp ./50-synaptics.conf /mnt
 cp user_conf /mnt
 cp conf /mnt
 cp grub /mnt
