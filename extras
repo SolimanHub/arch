@@ -3,39 +3,60 @@ set -e -u
 cd /
 # actualizando las bases para evitar errores
 pacman -Syy
-pacman -S xorg-server lightdm lightdm-gtk-greeter networkmanager --noconfirm
+
+# Inicio de session
+pacman -S xorg-server lightdm lightdm-gtk-greeter --noconfirm
+
+# Entorno de escritorio i3
+echo "1 2 3" | pacman -S i3 --noconfirm
+
+#Escritorio xfce4
+echo "all" | pacman -S xfce4 --noconfirm
+echo "all" | pacman -S xfce4-goodies --noconfirm
+
+pacman -S dbus sudo gtk-engines gtk-engine-murrine gnome-themes-standard --noconfirm
+
+# Herramientas desarrollo
+pacman -S docker docker-compose alacritty wget curl meld go git nodejs npm --noconfirm 
+
+# Herramientas del sistema
+pacman -S htop brightnessctl network-manager-applet networkmanager-openvpn nm-connection-editor pulseaudio pulseaudio-bluetooth pulseaudio-alsa pavucontrol gparted dmenu feh picom py3status pulsemixer gstreamer gst-libav gst-plugins-bad unzip gst-plugins-base gst-plugins-good gst-plugins-ugly --noconfirm 
+
+# mas paquetes
+pacman -S nemo firefox vokoscreen evince --noconfirm
+
+# AUR
+pacman -U Paquetes/yay-10.2.2-2-x86_64.pkg.tar.zst --noconfirm
+pacman -U Paquetes/pop-gtk-theme-5.3.3-1-any.pkg.tar.zst --noconfirm
+
 # cargando configuracion de lightdm
 rm /etc/lightdm/lightdm.conf
 mv lightdm.conf /etc/lightdm/
+echo "background=/usr/share/backgrounds/wall1.png" >> /etc/lightdm/lightdm-gtk-greeter.conf
+
 # configuracion para el touchpad
 mv 50-synaptics.conf /etc/X11/xorg.conf.d/
+
 #fonts
 mv fonts/* /usr/share/fonts/
 rm -r fonts/
+
 #servicios
 systemctl enable lightdm.service
 systemctl enable NetworkManager
 systemctl enable bluetooth.service
 
-#Escritorio xfce4
-echo "all" | pacman -S xfce4 --noconfirm
-echo "all" | pacman -S xfce4-goodies --noconfirm
-pacman -S dbus sudo gtk-engines gtk-engine-murrine gnome-themes-standard --noconfirm
 # cargando paquete de iconos
 mv Luv /usr/share/icons/
-# Entorno de escritorio i3
-echo "1 2 3" | pacman -S i3 --noconfirm
-# mas paquetes
-pacman -S htop brightnessctl alacritty network-manager-applet networkmanager-openvpn nm-connection-editor wget curl meld pulseaudio pulseaudio-bluetooth pulseaudio-alsa pavucontrol go firefox git gparted dmenu feh picom py3status vokoscreen pulsemixer nodejs npm evince gstreamer gst-libav gst-plugins-bad unzip gst-plugins-base gst-plugins-good gst-plugins-ugly --noconfirm
-# AUR
-pacman -U Paquetes/yay-10.2.2-2-x86_64.pkg.tar.zst --noconfirm
-pacman -U Paquetes/pop-gtk-theme-5.3.3-1-any.pkg.tar.zst --noconfirm
+
 # eliminados archivos importados del git arch
 rm conf grub extras
 rm -r Paquetes
+
 # comando ves carga y configuracion
 git clone https://github.com/SolimanHub/comando_ves
 ln -s /opt/comando_ves/ves /usr/bin/ves
+
 # recordamos el nombre de usuario 
 while IFS= read -r line
 do
@@ -43,7 +64,8 @@ do
 done < /opt/user
 rm /opt/user
 chmod 777 /user_conf
-cp /user_conf /home/$u
+mv /user_conf /home/$u
+
 # iniciamos como el nuevo usuario
 clear
 echo "===== ./user_conf ======"
