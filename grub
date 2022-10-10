@@ -3,6 +3,9 @@ set -e -u
 
 grub-install /dev/sda
 grub-mkconfig -o /boot/grub/grub.cfg
+rm /etc/default/grub
+mv ./grub_conf /etc/default/grub
+grub-mkconfig -o /boot/grub/grub.cfg
 
 echo "===== Contraseña root ====="
 passwd
