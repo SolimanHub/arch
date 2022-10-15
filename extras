@@ -8,7 +8,7 @@ pacman -Syy
 pacman -S xorg-server lightdm lightdm-gtk-greeter --noconfirm
 
 # Entorno de escritorio i3
-echo "1 2 3" | pacman -S i3 --noconfirm
+#echo "1 2 3" | pacman -S i3 --noconfirm
 
 #Escritorio xfce4
 echo "all" | pacman -S xfce4 --noconfirm
@@ -20,7 +20,10 @@ pacman -S dbus sudo gtk-engines gtk-engine-murrine gnome-themes-standard --nocon
 pacman -S docker docker-compose alacritty wget curl meld go git nodejs npm --noconfirm 
 
 # Herramientas del sistema
-pacman -S htop brightnessctl network-manager-applet networkmanager-openvpn nm-connection-editor pulseaudio pulseaudio-bluetooth pulseaudio-alsa pavucontrol gparted dmenu feh picom py3status pulsemixer gstreamer gst-libav gst-plugins-bad unzip gst-plugins-base gst-plugins-good gst-plugins-ugly --noconfirm 
+pacman -S htop xdg-user-dirs dhcpcd neovim netctl acpi bluez bluez-utils grub networkmanager network-manager-applet networkmanager-openvpn nm-connection-editor pulseaudio pulseaudio-bluetooth pulseaudio-alsa pavucontrol gparted pulsemixer gstreamer gst-libav gst-plugins-bad unzip gst-plugins-base gst-plugins-good gst-plugins-ugly --noconfirm 
+
+# Herramientas i3
+#pacman -S brightnessc dmenu feh picom py3status i3-gaps
 
 # mas paquetes
 pacman -S nemo firefox vokoscreen evince --noconfirm
