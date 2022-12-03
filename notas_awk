@@ -1,0 +1,5 @@
+Para buscar una cadena con awk usamos /<cadena>/ dentro de '' antes de {}
+eliminar las lineas en blanco:
+awk 'NF > 0' data | tee nuevo_documento
+x
+
