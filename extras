@@ -18,10 +18,10 @@ pacman -S dbus sudo gtk-engines gtk-engine-murrine gnome-themes-standard --nocon
 pacman -S docker docker-compose alacritty wget curl meld go git nodejs npm --noconfirm 
 
 # Herramientas del sistema
-pacman -S tree htop xdg-user-dirs dhcpcd neovim netctl acpi bluez bluez-utils networkmanager network-manager-applet networkmanager-openvpn nm-connection-editor pulseaudio pulseaudio-bluetooth pulseaudio-alsa pavucontrol gparted pulsemixer gstreamer gst-libav gst-plugins-bad unzip gst-plugins-base gst-plugins-good gst-plugins-ugly --noconfirm 
+pacman -S xclip tree htop xdg-user-dirs dhcpcd neovim netctl acpi bluez bluez-utils networkmanager network-manager-applet networkmanager-openvpn nm-connection-editor pulseaudio pulseaudio-bluetooth pulseaudio-alsa pavucontrol gparted pulsemixer gstreamer gst-libav gst-plugins-bad unzip gst-plugins-base gst-plugins-good gst-plugins-ugly --noconfirm 
 
 # Herramientas i3
-#pacman -S brightnessc dmenu feh picom py3status i3-gaps
+pacman -S brightnessc dmenu feh picom py3status i3-gaps
 
 # mas paquetes
 pacman -S nemo firefox vokoscreen evince --noconfirm
