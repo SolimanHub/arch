@@ -1,0 +1,93 @@
+#!/usr/bin/bash
+set -e -u
+cd /
+
+# Inicio de sesión y servicios base
+pacman -S xorg-server lightdm lightdm-gtk-greeter --noconfirm
+
+# Menú para selección de entornos de escritorio
+echo "===== Seleccione los entornos de escritorio a instalar ====="
+echo "Separe las opciones con comas en caso de desear mas de uno (ejemplo: 1,2 o 1,2,3,4):"
+echo "1) i3wm"
+echo "2) XFCE4"
+echo "3) GNOME"
+echo "4) KDE Plasma"
+read -rp "Opción(es): " desktop_choices
+
+# Convertir la entrada en un arreglo
+IFS=',' read -ra choices <<< "$desktop_choices"
+# Eliminar posibles espacios
+for i in "${!choices[@]}"; do
+    choices[$i]=$(echo "${choices[$i]}" | xargs)
+done
+
+# Instalar cada entorno seleccionado
+for choice in "${choices[@]}"; do
+    case "$choice" in
+        1)
+            echo "Instalando i3wm..."
+            pacman -S i3 --noconfirm
+            pacman -S brightnessc dmenu feh picom py3status i3-gaps --noconfirm
+            ;;
+        2)
+            echo "Instalando XFCE4..."
+            pacman -S xfce4 xfce4-goodies --noconfirm
+            ;;
+        3)
+            echo "Instalando GNOME..."
+            pacman -S gnome gnome-extra --noconfirm
+            ;;
+        4)
+            echo "Instalando KDE Plasma..."
+            pacman -S plasma kde-applications --noconfirm
+            ;;
+        *)
+            echo "Opción '$choice' no reconocida y se omitirá."
+            ;;
+    esac
+done
+
+# Instalación de paquetes comunes y adicionales
+pacman -S dbus sudo gtk-engines gtk-engine-murrine gnome-themes-standard --noconfirm
+
+# Herramientas de desarrollo
+pacman -S docker docker-compose alacritty wget curl meld go git nodejs npm --noconfirm 
+
+# Herramientas del sistema
+pacman -S xclip tree htop xdg-user-dirs dhcpcd netctl acpi bluez bluez-utils networkmanager network-manager-applet networkmanager-openvpn nm-connection-editor pulseaudio pulseaudio-bluetooth pulseaudio-alsa pavucontrol gparted pulsemixer gstreamer gst-libav gst-plugins-bad unzip gst-plugins-base gst-plugins-good gst-plugins-ugly --noconfirm 
+
+# Paquetes adicionales
+pacman -S nemo firefox vokoscreen evince --noconfirm
+
+# Instalación de paquetes AUR locales
+pacman -U Paquetes/yay-10.2.2-2-x86_64.pkg.tar.zst --noconfirm
+pacman -U Paquetes/pop-gtk-theme-5.3.3-1-any.pkg.tar.zst --noconfirm
+
+# Configuración de lightdm
+rm /etc/lightdm/lightdm.conf
+mv lightdm.conf /etc/lightdm/
+echo "background=/usr/share/backgrounds/wall1.png" >> /etc/lightdm/lightdm-gtk-greeter.conf
+
+# Configuración para el touchpad
+mv 50-synaptics.conf /etc/X11/xorg.conf.d/
+
+# Instalación de fuentes
+mv fonts/* /usr/share/fonts/
+rm -r fonts/
+
+# Habilitar servicios
+systemctl enable lightdm.service
+systemctl enable NetworkManager
+systemctl enable bluetooth.service
+
+# Cargar paquete de iconos
+mv Luv /usr/share/icons/
+
+# Limpieza de archivos importados
+rm conf grub extras
+rm -r Paquetes
+
+# Comando ves carga y configuración
+cd /opt/
+git clone https://github.com/SolimanHub/comando_ves
+ln -s /opt/comando_ves/ves /usr/bin/ves

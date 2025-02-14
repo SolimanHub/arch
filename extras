@@ -1,93 +1,136 @@
 #!/usr/bin/bash
-set -e -u
+set -euo pipefail
 cd /
 
-# Inicio de sesión y servicios base
-pacman -S xorg-server lightdm lightdm-gtk-greeter --noconfirm
+# ===== Configuraciones iniciales =====
+export LC_ALL=C
+DEFAULT_DESKTOP=1
+MINIMAL_INSTALL="n"
+USER_HOME="/home/${SUDO_USER:-$USER}"
 
-# Menú para selección de entornos de escritorio
-echo "===== Seleccione los entornos de escritorio a instalar ====="
-echo "Separe las opciones con comas en caso de desear mas de uno (ejemplo: 1,2 o 1,2,3,4):"
-echo "1) i3wm"
-echo "2) XFCE4"
-echo "3) GNOME"
-echo "4) KDE Plasma"
-read -rp "Opción(es): " desktop_choices
+# ===== Detección automática de drivers gráficos =====
+detect_gpu_drivers() {
+    echo "Detectando controladores gráficos..."
+    local gpu_info=$(lspci | grep -i vga)
+    
+    if grep -qi "intel" <<< "$gpu_info"; then
+        pacman -S --noconfirm xf86-video-intel vulkan-intel intel-media-driver
+    elif grep -qi "amd" <<< "$gpu_info"; then
+        pacman -S --noconfirm xf86-video-amdgpu vulkan-radeon libva-mesa-driver
+    elif grep -qi "nvidia" <<< "$gpu_info"; then
+        pacman -S --noconfirm nvidia nvidia-utils nvidia-settings cuda
+    else
+        echo "Usando controladores genéricos (modesetting)"
+    fi
+}
 
-# Convertir la entrada en un arreglo
-IFS=',' read -ra choices <<< "$desktop_choices"
-# Eliminar posibles espacios
-for i in "${!choices[@]}"; do
-    choices[$i]=$(echo "${choices[$i]}" | xargs)
-done
 
-# Instalar cada entorno seleccionado
-for choice in "${choices[@]}"; do
-    case "$choice" in
-        1)
-            echo "Instalando i3wm..."
-            pacman -S i3 --noconfirm
-            pacman -S brightnessc dmenu feh picom py3status i3-gaps --noconfirm
-            ;;
-        2)
-            echo "Instalando XFCE4..."
-            pacman -S xfce4 xfce4-goodies --noconfirm
-            ;;
-        3)
-            echo "Instalando GNOME..."
-            pacman -S gnome gnome-extra --noconfirm
-            ;;
-        4)
-            echo "Instalando KDE Plasma..."
-            pacman -S plasma kde-applications --noconfirm
-            ;;
-        *)
-            echo "Opción '$choice' no reconocida y se omitirá."
-            ;;
-    esac
-done
+# ===== Instalación mínima =====
+read -rp "¿Desea instalación mínima? [S/n]: " MINIMAL_INSTALL
+MINIMAL_INSTALL=${MINIMAL_INSTALL,,}
 
-# Instalación de paquetes comunes y adicionales
-pacman -S dbus sudo gtk-engines gtk-engine-murrine gnome-themes-standard --noconfirm
+# ===== Paquetes base esenciales =====
+pacman -S --needed --noconfirm \
+    xorg-server xorg-xinit xorg-xrandr \
+    sudo bash-completion nano curl wget git \
+    man-db man-pages texinfo pciutils
 
-# Herramientas de desarrollo
-pacman -S docker docker-compose alacritty wget curl meld go git nodejs npm --noconfirm 
+# ===== Instalar controladores y kernel =====
+detect_gpu_drivers
+select_kernel
 
-# Herramientas del sistema
-pacman -S xclip tree htop xdg-user-dirs dhcpcd netctl acpi bluez bluez-utils networkmanager network-manager-applet networkmanager-openvpn nm-connection-editor pulseaudio pulseaudio-bluetooth pulseaudio-alsa pavucontrol gparted pulsemixer gstreamer gst-libav gst-plugins-bad unzip gst-plugins-base gst-plugins-good gst-plugins-ugly --noconfirm 
+# ===== Selección de entornos gráficos (actualizado) =====
+if [[ "$MINIMAL_INSTALL" != "s" ]]; then
+    echo "===== Selección de entornos gráficos ====="
+    echo "1) i3wm (Default)"
+    echo "2) XFCE4"
+    echo "3) GNOME"
+    echo "4) KDE Plasma"
+    echo "5) Hyprland (Wayland moderno)"
+    echo "6) GNOME Minimal"
+    echo "7) Sway (i3 en Wayland)"
+    read -rp "Opciones (separar por comas): " desktop_choices
 
-# Paquetes adicionales
-pacman -S nemo firefox vokoscreen evince --noconfirm
+    IFS=',' read -ra choices <<< "${desktop_choices:-$DEFAULT_DESKTOP}"
+    
+    for choice in "${choices[@]}"; do
+        case "$(tr -d '[:space:]' <<< "$choice")" in
+            1) pacman -S --noconfirm i3-gaps rofi picom feh dunst polybar ;;
+            2) pacman -S --noconfirm xfce4 xfce4-goodies ;;
+            3) pacman -S --noconfirm gnome gnome-extra ;;
+            4) pacman -S --noconfirm plasma kde-applications ;;
+            5) pacman -S --noconfirm hyprland waybar grim slurp wofi ;;
+            6) pacman -S --noconfirm gnome-shell gnome-control-center gdm ;;
+            7) pacman -S --noconfirm sway swaylock swayidle wofi ;;
+            *) echo "Opción $choice omitida" ;;
+        esac
+    done
+fi
 
-# Instalación de paquetes AUR locales
-pacman -U Paquetes/yay-10.2.2-2-x86_64.pkg.tar.zst --noconfirm
-pacman -U Paquetes/pop-gtk-theme-5.3.3-1-any.pkg.tar.zst --noconfirm
+# ===== Paquetes opcionales (solo instalación completa) =====
+if [[ "$MINIMAL_INSTALL" != "s" ]]; then
+    # Paquetes esenciales mejorados
+    pacman -S --noconfirm \
+        lightdm lightdm-gtk-greeter \
+        noto-fonts noto-fonts-emoji ttf-firacode-nerd \
+        networkmanager network-manager-applet \
+        pulseaudio pavucontrol pulseaudio-alsa \
+        kitty thunar firefox neovim
+    
+    # Herramientas de desarrollo
+    pacman -S --noconfirm \
+        docker docker-compose nodejs npm go rust \
+        python python-pip base-devel
+    
+    # Instalación de yay para AUR
+    if ! command -v yay &> /dev/null; then
+        git clone https://aur.archlinux.org/yay.git
+        (cd yay && makepkg -si --noconfirm)
+        rm -rf yay
+    fi
+    
+    # Paquetes AUR recomendados
+    yay -S --noconfirm \
+        nerd-fonts-fira-code \
+        papirus-icon-theme \
+        tela-icon-theme \
+        zsh-theme-powerlevel10k
+fi
 
-# Configuración de lightdm
-rm /etc/lightdm/lightdm.conf
-mv lightdm.conf /etc/lightdm/
-echo "background=/usr/share/backgrounds/wall1.png" >> /etc/lightdm/lightdm-gtk-greeter.conf
+# ===== Configuración de dotfiles =====
+read -rp "¿Desea instalar dotfiles personalizados? (URL del repo o Enter para omitir): " DOTFILES_URL
+if [[ -n "$DOTFILES_URL" ]]; then
+    git clone "$DOTFILES_URL" "${USER_HOME}/.dotfiles"
+    rsync -a "${USER_HOME}/.dotfiles/" "${USER_HOME}/"
+    chown -R "${SUDO_USER:-$USER}:${SUDO_USER:-$USER}" "${USER_HOME}"
+fi
 
-# Configuración para el touchpad
-mv 50-synaptics.conf /etc/X11/xorg.conf.d/
+# ===== Configuraciones post-instalación =====
+# Configuración básica de zsh
+pacman -S --noconfirm zsh
+chsh -s /bin/zsh "${SUDO_USER:-$USER}"
 
-# Instalación de fuentes
-mv fonts/* /usr/share/fonts/
-rm -r fonts/
-
-# Habilitar servicios
-systemctl enable lightdm.service
+# Configurar servicios
 systemctl enable NetworkManager
-systemctl enable bluetooth.service
+[[ "$MINIMAL_INSTALL" != "s" ]] && systemctl enable lightdm
 
-# Cargar paquete de iconos
-mv Luv /usr/share/icons/
+# Configuración de kernel alternativo
+if pacman -Qi linux-zen &>/dev/null; then
+    cat > /etc/mkinitcpio.conf << EOF
+PRESETS=('default' 'fallback')
+COMPRESSION="zstd"
+EOF
+    mkinitcpio -P
+fi
 
-# Limpieza de archivos importados
-rm conf grub extras
-rm -r Paquetes
+# Configuración de Hyprland (si está instalado)
+if pacman -Qi hyprland &>/dev/null; then
+    sudo -u "${SUDO_USER:-$USER}" mkdir -p "${USER_HOME}/.config/hypr"
+    cat > "${USER_HOME}/.config/hypr/hyprland.conf" << EOF
+exec-once = waybar & dbus-update-activation-environment --systemd & hyprpaper
+monitor = ,preferred,auto,1
+input { kb_layout = es }
+EOF
+fi
 
-# Comando ves carga y configuración
-cd /opt/
-git clone https://github.com/SolimanHub/comando_ves
-ln -s /opt/comando_ves/ves /usr/bin/ves
+echo "¡Instalación completada con éxito!"
