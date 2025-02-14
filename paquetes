@@ -1,7 +1,22 @@
-#!/usr/bin/bash
-set -e -u
+#!/usr/bin/env bash
+set -euo pipefail
 
-pacstrap /mnt base base-devel efibootmgr gvfs gvfs-afc gvfs-mtp linux linux-firmware wpa_supplicant dialog xf86-input-synaptics
+echo "Seleccione su procesador para instalar el microcódigo adecuado:"
+echo "1) Intel"
+echo "2) AMD"
+read -rp "Opción [1/2]: " proc_choice
+
+microcode=""
+if [ "$proc_choice" = "1" ]; then
+    microcode="intel-ucode"
+elif [ "$proc_choice" = "2" ]; then
+    microcode="amd-ucode"
+else
+    echo "Opción no válida, no se instalará microcódigo."
+fi
+
+pacstrap /mnt base base-devel efibootmgr gvfs gvfs-afc gvfs-mtp linux linux-firmware \
+           wpa_supplicant dialog xf86-input-synaptics networkmanager neovim htop $microcode
 
 genfstab -pU /mnt >> /mnt/etc/fstab
 
