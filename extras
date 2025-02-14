@@ -107,27 +107,27 @@ if [[ "$MINIMAL_INSTALL" != "s" ]]; then
         python python-pip base-devel
     
     # Instalación de yay para AUR
-    if ! command -v yay &> /dev/null; then
-        git clone https://aur.archlinux.org/yay.git
-        (cd yay && makepkg -si --noconfirm)
-        rm -rf yay
-    fi
-    
-    # Paquetes AUR recomendados
-    yay -S --noconfirm \
-        nerd-fonts-fira-code \
-        papirus-icon-theme \
-        tela-icon-theme \
-        zsh-theme-powerlevel10k
+#    if ! command -v yay &> /dev/null; then
+#        git clone https://aur.archlinux.org/yay.git
+#        (cd yay && makepkg -si --noconfirm)
+#        rm -rf yay
+#    fi
+#    
+#    # Paquetes AUR recomendados
+#    yay -S --noconfirm \
+#        nerd-fonts-fira-code \
+#        papirus-icon-theme \
+#        tela-icon-theme \
+#        zsh-theme-powerlevel10k
 fi
 
 # ===== Configuración de dotfiles =====
-read -rp "¿Desea instalar dotfiles personalizados? (URL del repo o Enter para omitir): " DOTFILES_URL
-if [[ -n "$DOTFILES_URL" ]]; then
-    git clone "$DOTFILES_URL" "${USER_HOME}/.dotfiles"
-    rsync -a "${USER_HOME}/.dotfiles/" "${USER_HOME}/"
-    chown -R "${SUDO_USER:-$USER}:${SUDO_USER:-$USER}" "${USER_HOME}"
-fi
+#read -rp "¿Desea instalar dotfiles personalizados? (URL del repo o Enter para omitir): " DOTFILES_URL
+#if [[ -n "$DOTFILES_URL" ]]; then
+#    git clone "$DOTFILES_URL" "${USER_HOME}/.dotfiles"
+#    rsync -a "${USER_HOME}/.dotfiles/" "${USER_HOME}/"
+#    chown -R "${SUDO_USER:-$USER}:${SUDO_USER:-$USER}" "${USER_HOME}"
+#fi
 
 # ===== Configuraciones post-instalación =====
 # Configuración básica de zsh

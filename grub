@@ -37,7 +37,7 @@ echo "===== Crear contraseña para $usuario ====="
 passwd "$usuario"
 
 chmod +x extras
-./extras
+#./extras
 
 #grub-install /dev/sda
 #grub-mkconfig -o /boot/grub/grub.cfg
