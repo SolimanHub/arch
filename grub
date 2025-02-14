@@ -6,7 +6,7 @@ pacman -Syy
 pacman -S grub --noconfirm
 
 # Mostrar las unidades disponibles para que el usuario seleccione dónde instalar GRUB
-echo "===== Unidades disponibles ====="
+echo "===== Unidades disponibles para instalar GRUB ====="
 lsblk -d -o NAME,SIZE,MODEL
 echo
 read -rp "Ingrese el nombre de la unidad (ejemplo: sda): " disk
@@ -33,7 +33,7 @@ read -rp "Nombre de Usuario: " usuario
 echo "$usuario" > /opt/user
 
 useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner -s /bin/bash "$usuario"
-echo "===== Crear contraseña parsa $usuario ====="
+echo "===== Crear contraseña para $usuario ====="
 passwd "$usuario"
 
 chmod +x extras
