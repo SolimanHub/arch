@@ -3,7 +3,6 @@ set -e -u
 
 cp ./configs/sudoers /mnt
 cp ./configs/50-synaptics.conf /mnt
-cp user_conf /mnt
 cp conf /mnt
 cp grub /mnt
 cp ./configs/grub_conf /mnt
