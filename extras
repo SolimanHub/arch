@@ -67,6 +67,7 @@ if [[ "$MINIMAL_INSTALL" != "s" ]]; then
     echo "5) Hyprland (Wayland moderno)"
     echo "6) GNOME Minimal"
     echo "7) Sway (i3 en Wayland)"
+    echo "8) MATE (Clásico ligero)"
     read -rp "Opciones (separar por comas): " desktop_choices
 
     IFS=',' read -ra choices <<< "${desktop_choices:-$DEFAULT_DESKTOP}"
@@ -80,6 +81,7 @@ if [[ "$MINIMAL_INSTALL" != "s" ]]; then
             5) pacman -S --noconfirm hyprland waybar grim slurp wofi ;;
             6) pacman -S --noconfirm gnome-shell gnome-control-center gdm ;;
             7) pacman -S --noconfirm sway swaylock swayidle wofi ;;
+            8) pacman -S --noconfirm mate mate-extra mate-media ;;  # <- MATE añadido aquí
             *) echo "Opción $choice omitida" ;;
         esac
     done
@@ -92,8 +94,12 @@ if [[ "$MINIMAL_INSTALL" != "s" ]]; then
         lightdm lightdm-gtk-greeter \
         noto-fonts noto-fonts-emoji ttf-firacode-nerd \
         networkmanager network-manager-applet \
-        pulseaudio pavucontrol pulseaudio-alsa \
+        pipewire pipewire-pulse pipewire-alsa pipewire-jack wireplumber \
+        pavucontrol \
         kitty thunar firefox neovim
+    
+    # Eliminar pulseaudio si existe
+    pacman -Rdd --noconfirm pulseaudio 2>/dev/null || true
     
     # Herramientas de desarrollo
     pacman -S --noconfirm \
@@ -131,6 +137,9 @@ chsh -s /bin/zsh "${SUDO_USER:-$USER}"
 # Configurar servicios
 systemctl enable NetworkManager
 [[ "$MINIMAL_INSTALL" != "s" ]] && systemctl enable lightdm
+
+# Configurar PipeWire
+systemctl --user enable pipewire pipewire-pulse wireplumber
 
 # Configuración de kernel alternativo
 if pacman -Qi linux-zen &>/dev/null; then
