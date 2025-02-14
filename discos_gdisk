@@ -15,24 +15,37 @@ DISCO="/dev/$unidad"
 tamanio_bytes=$(blockdev --getsize64 "$DISCO")
 tamanio_mb=$((tamanio_bytes / 1024 / 1024))
 
-# Definir tamaños fijos y calcular espacio flexible:
-# 1 MB para BIOS Boot, 100 MB para EFI y 2048 MB para swap.
+# Definir tamaños fijos y calcular espacio flexible
 swap_size_mb=2048
 overhead=$((1 + 100 + swap_size_mb))
 flexible=$((tamanio_mb - overhead))
-home_mb=$(( flexible / 2 ))  # aprox. la mitad para /home
+flexible_gb=$(( flexible / 1024 ))
 
-echo "Tamaño del disco: ${tamanio_mb} MB"
-echo "Tamaño para swap: ${swap_size_mb} MB"
-echo "Tamaño para /home: ${home_mb} MB (aprox.)"
+echo -e "\nTamaño total del disco: ${tamanio_mb} MB"
+echo "Espacio disponible para distribuir: ${flexible_gb} GB"
+
+# Solicitar porcentaje para home
+read -rp "Ingrese el porcentaje para /home (1-99, default 50%): " home_percent
+home_percent=${home_percent:-50}
+
+# Validar entrada
+if [[ ! "$home_percent" =~ ^[0-9]+$ ]] || (( home_percent < 1 || home_percent > 99 )); then
+    echo "Valor inválido. Usando 50% por defecto."
+    home_percent=50
+fi
+
+# Calcular tamaños
+home_mb=$(( flexible * home_percent / 100 ))
+root_mb=$(( flexible - home_mb ))
+root_gb=$(( root_mb / 1024 ))
+home_gb=$(( home_mb / 1024 ))
+
+echo -e "\nResumen de particiones:"
+echo "• Swap: 2 GB (2048 MB)"
+echo "• /home: ${home_gb} GB (${home_percent}%)"
+echo "• / (root): ${root_gb} GB"
 
 echo -e "\n=== Particionado con gdisk ==="
-# Se crean 5 particiones:
-# 1. BIOS Boot (1MB, tipo EF02)
-# 2. EFI (100MB, tipo EF00)
-# 3. Swap (2GB, tipo 8200)
-# 4. /home (tamaño calculado, tipo 8300)
-# 5. Raíz (lo que reste, tipo 8300)
 gdisk "$DISCO" <<EOF
 o
 Y
@@ -78,9 +91,8 @@ mount "${DISCO}4" /mnt/home
 mkdir -p /mnt/boot/EFI
 mount "${DISCO}2" /mnt/boot/EFI
 
-echo -e "\nActivando swap ..."
+echo -e "\nActivando swap..."
 swapon "${DISCO}3"
 
 echo -e "\nProceso finalizado."
 ./paquetes
-
