@@ -7,7 +7,7 @@ pacman -S grub --noconfirm
 
 # Mostrar las unidades disponibles para que el usuario seleccione dónde instalar GRUB
 echo "===== Unidades disponibles ====="
-lsblk -d -o NAME,SIZE,MODEL | grep -E 'disk'
+lsblk -d -o NAME,SIZE,MODEL
 echo
 read -rp "Ingrese el nombre de la unidad (ejemplo: sda): " disk
 GRUB_DISK="/dev/$disk"
