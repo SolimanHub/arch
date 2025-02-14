@@ -24,6 +24,24 @@ detect_gpu_drivers() {
     fi
 }
 
+# ===== Selección de kernel =====
+select_kernel() {
+    echo "===== Selección de Kernel ====="
+    echo "1) Linux Standard (default)"
+    echo "2) Linux-Zen (mejor para escritorio)"
+    echo "3) Linux-LTS (larga vida útil)"
+    echo "4) Todos los kernels anteriores"
+    read -rp "Seleccione kernel [1-4]: " kernel_choice
+    
+    case "$kernel_choice" in
+        2) kernels="linux-zen linux-zen-headers" ;;
+        3) kernels="linux-lts linux-lts-headers" ;;
+        4) kernels="linux linux-headers linux-zen linux-zen-headers linux-lts linux-lts-headers" ;;
+        *) kernels="linux linux-headers" ;;
+    esac
+    
+    pacman -S --noconfirm $kernels
+}
 
 # ===== Instalación mínima =====
 read -rp "¿Desea instalación mínima? [S/n]: " MINIMAL_INSTALL
