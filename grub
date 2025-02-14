@@ -5,23 +5,57 @@ set -e -u
 pacman -Syy
 pacman -S grub --noconfirm
 
-grub-install /dev/sda
+# Mostrar las unidades disponibles para que el usuario seleccione dónde instalar GRUB
+echo "===== Unidades disponibles ====="
+lsblk -d -o NAME,SIZE,MODEL | grep -E 'disk'
+echo
+read -rp "Ingrese el nombre de la unidad (ejemplo: sda): " disk
+GRUB_DISK="/dev/$disk"
+
+# Instalar GRUB en la unidad seleccionada y generar la configuración inicial
+grub-install "$GRUB_DISK"
 grub-mkconfig -o /boot/grub/grub.cfg
-rm /etc/default/grub
+
+# Reemplazar el archivo de configuración de GRUB
+if [ -f /etc/default/grub ]; then
+    rm /etc/default/grub
+fi
 mv ./grub_conf /etc/default/grub
 grub-mkconfig -o /boot/grub/grub.cfg
 
-echo "===== Contraseña root ====="
+echo "===== Configurar contraseña de root ====="
 passwd
 
-echo "===== Crear usuario: ======"
-echo "Nombre de Usuario:"
-read usuario
+echo "===== Crear usuario ====="
+read -rp "Nombre de Usuario: " usuario
 
-#crea un archivo user, se usa en extras
-echo $usuario > /opt/user
+# Guardar el nombre del usuario en un archivo para usarlo en extras
+echo "$usuario" > /opt/user
 
-useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner -s /bin/bash $usuario && passwd $usuario
+useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner -s /bin/bash "$usuario"
+echo "===== Crear contraseña parsa $usuario ====="
+passwd "$usuario"
 
 chmod +x extras
 ./extras
+
+#grub-install /dev/sda
+#grub-mkconfig -o /boot/grub/grub.cfg
+#rm /etc/default/grub
+#mv ./grub_conf /etc/default/grub
+#grub-mkconfig -o /boot/grub/grub.cfg
+#
+#echo "===== Contraseña root ====="
+#passwd
+#
+#echo "===== Crear usuario: ======"
+#echo "Nombre de Usuario:"
+#read usuario
+#
+##crea un archivo user, se usa en extras
+#echo $usuario > /opt/user
+#
+#useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner -s /bin/bash $usuario && passwd $usuario
+#
+#chmod +x extras
+#./extras

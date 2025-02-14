@@ -1,10 +1,31 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-mv /sudoers /etc/
-echo dse-pc > /etc/hostname
+# Verificar que el archivo sudoers existe antes de moverlo
+if [ -e /sudoers ]; then
+    mv /sudoers /etc/
+else
+    echo "Advertencia: /sudoers no existe. Se omitirá el movimiento."
+fi
+
+# Solicitar al usuario el nombre de host
+read -rp "Ingrese el nombre de host deseado: " hostname
+if [ -z "$hostname" ]; then
+    echo "No se ingresó ningún nombre. Usando 'dse-pc' por defecto."
+    hostname="dse-pc"
+fi
+echo "$hostname" > /etc/hostname
+
+# Configuración de zona horaria
 ln -sf /usr/share/zoneinfo/America/Tegucigalpa /etc/localtime
+
+# Configuración de locales
 echo "es_HN.UTF-8 UTF-8" >> /etc/locale.gen
-echo LANG=es_HN.UTF-8 > /etc/locale.conf
+echo "LANG=es_HN.UTF-8" > /etc/locale.conf
 locale-gen
+
+# Sincronizar el reloj de hardware
 hwclock -w
+
+# Ejecutar configuración de GRUB
 ./grub
