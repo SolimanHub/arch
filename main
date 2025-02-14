@@ -1,21 +1,12 @@
-#!/usr/bin/bash
-set -e -u
+#!/usr/bin/env bash
+set -euo pipefail
 
 loadkeys es
 
-echo "El particionando automatico del disco es para maquinas virtuales"
-echo "por lo que recomiendo hacer el particionado de discos de forma manual"
-echo "para tener una referencia de como utilizar el comando fdisk"
-echo "puede ver el codigo del archivo llamado 'discos'"
-echo
-echo "¿Desea hacer el particionado manual? [S/N]"
+read -rp "¿Desea hacer el particionado manual? [S/N] " respuesta
 
-read respuesta
-
-if [ $respuesta = "S" ] || [ $respuesta = "s" ] || [ $respuesta = "" ]
-then
-  echo "EXCELENTE eleccion, al finalizar ejecute el script ./paquetes"
+if [[ "${respuesta,,}" =~ ^s?$ ]]; then
+    echo -e "\nExcelente elección. Al finalizar ejecute el script: ./paquetes"
 else
-  ./discos
+    ./discos_gdisk
 fi
-

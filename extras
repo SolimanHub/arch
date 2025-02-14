@@ -91,17 +91,3 @@ rm -r Paquetes
 cd /opt/
 git clone https://github.com/SolimanHub/comando_ves
 ln -s /opt/comando_ves/ves /usr/bin/ves
-
-# Recuperar el nombre de usuario
-while IFS= read -r line; do
-  u="$line"
-done < /opt/user
-rm /opt/user
-chmod 777 /user_conf
-mv /user_conf /home/"$u"
-
-# Iniciar sesión como el nuevo usuario
-clear
-echo "===== ./user_conf ======"
-su "$u"
-
