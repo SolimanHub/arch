@@ -49,7 +49,7 @@ echo "• /home: ${home_gb} GB (${home_percent}%)"
 echo "• / (root): ${root_gb} GB"
 
 echo -e "\n=== Particionado con gdisk ==="
-gdisk "$DISCO" <<EOF
+gdisk "$DISCO" <<EOF > gdisk.log 2>&1
 o
 Y
 n
