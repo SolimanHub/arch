@@ -52,24 +52,32 @@ echo -e "\n=== Particionado con gdisk ==="
 gdisk "$DISCO" <<EOF > gdisk.log 2>&1
 o
 Y
-n
-1
-+550M
-EF00
-n
-2
-+${swap_size_mb}M
-8200
-n
-3
-+${home_mb}M
-8300
-n
-4
+n  # Crea la partición EFI
+1  # Número de partición 1
+"" # Primer sector (dejarlo por defecto)
++550M # Tamaño de la partición
+EF00 # Código de tipo EFI
 
-8300
-w
-Y
+n  # Crea la partición Swap
+2  # Número de partición 2
+"" # Primer sector (dejarlo por defecto)
++${swap_size_mb}M # Tamaño de la partición
+8200 # Código de tipo Swap
+
+n  # Crea la partición /home
+3  # Número de partición 3
+"" # Primer sector (dejarlo por defecto)
++${home_mb}M # Tamaño de la partición
+8300 # Código de tipo Linux filesystem
+
+n  # Crea la partición / (root)
+4  # Número de partición 4
+"" # Primer sector (dejarlo por defecto)
+"" # Último sector (dejarlo por defecto, usa todo el espacio restante)
+8300 # Código de tipo Linux filesystem
+
+w # Escribe la tabla de particiones al disco
+Y # Confirma la escritura
 EOF
 
 echo -e "\n=== Formateando particiones ==="
