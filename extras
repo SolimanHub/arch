@@ -55,7 +55,6 @@ pacman -S --needed --noconfirm \
     xorg-server xorg-xinit xorg-xrandr \
     sudo bash-completion nano curl wget git \
     man-db man-pages texinfo pciutils \
-    efibootmgr gvfs gvfs-afc gvfs-mtp  \
     wpa_supplicant dialog xf86-input-synaptics htop
 
 # ===== Instalar controladores y kernel =====

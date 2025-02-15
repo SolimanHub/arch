@@ -17,7 +17,7 @@ esac
 
 
 # --- Instalación base ---
-pacstrap /mnt base $microcode linux-firmware 
+pacstrap /mnt base efibootmgr gvfs gvfs-afc gvfs-mtp $microcode linux-firmware 
 
 # --- Generar fstab ---
 genfstab -U /mnt >> /mnt/etc/fstab
