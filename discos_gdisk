@@ -92,4 +92,5 @@ echo -e "\nActivando swap..."
 swapon "${DISCO}2"
 
 echo -e "\nProceso finalizado."
+echo "Sigue ./paquetes"
 ./paquetes

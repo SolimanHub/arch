@@ -14,4 +14,4 @@ cp -r fonts/ /mnt
 
 echo "====== ./conf ====="
 
-arch-chroot /mnt
+arch-chroot /mnt /conf
