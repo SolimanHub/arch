@@ -1,25 +1,35 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# --- Selección de microcódigo ---
-echo "Seleccione su procesador para instalar el microcódigo adecuado:"
-echo "<<==============================>>"
-echo "1) Intel"
-echo "2) AMD"
-read -rp "Opción [1/2]: " proc_choice
+# --- Selección de kernel ---
+select_kernel() {
+    echo "===== Selección de Kernel ====="
+    echo "1) Linux Standard (default)"
+    echo "2) Linux-Zen (mejor para escritorio)"
+    echo "3) Linux-LTS (larga vida útil)"
+    echo "4) Todos los kernels anteriores"
+    read -rp "Seleccione kernel [1-4]: " kernel_choice
 
-microcode=""
-case "$proc_choice" in
-    1) microcode="intel-ucode" ;;
-    2) microcode="amd-ucode" ;;
-    *) echo "Opción no válida, no se instalará microcódigo." ;;
-esac
-
+    case "$kernel_choice" in
+        2) echo "linux-zen linux-zen-headers" ;;
+        3) echo "linux-lts linux-lts-headers" ;;
+        4) echo "linux linux-headers linux-zen linux-zen-headers linux-lts linux-lts-headers" ;;
+        *) echo "linux linux-headers" ;;
+    esac
+}
 
 # --- Instalación base ---
-pacstrap /mnt base efibootmgr gvfs gvfs-afc gvfs-mtp $microcode linux-firmware 
+echo "Seleccionando kernel..."
+selected_kernels=$(select_kernel)
+
+# Mostrar los kernels seleccionados
+echo "Kernels seleccionados: $selected_kernels"
+
+# Instalar los paquetes base junto con los kernels seleccionados
+pacstrap /mnt base linux-firmware $selected_kernels
 
 # --- Generar fstab ---
+echo "Generando fstab..."
 genfstab -U /mnt >> /mnt/etc/fstab
 
 # --- Continuar configuración ---

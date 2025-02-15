@@ -3,7 +3,7 @@ set -e -u
 
 # actualizando las bases para evitar errores
 pacman -Syy
-pacman -S grub --noconfirm
+pacman -S grub efibootmgr --noconfirm
 
 # Mostrar las unidades disponibles para que el usuario seleccione dónde instalar GRUB
 echo "===== Unidades disponibles para instalar GRUB ====="
