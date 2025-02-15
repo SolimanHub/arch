@@ -27,5 +27,5 @@ locale-gen
 # Sincronizar el reloj de hardware
 hwclock -w
 
-# Ejecutar configuración de GRUB
-./grub
+# Ejecutar configuración de usuarios
+ ./usuarios
