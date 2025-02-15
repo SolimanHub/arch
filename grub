@@ -23,39 +23,5 @@ fi
 mv ./grub_conf /etc/default/grub
 grub-mkconfig -o /boot/grub/grub.cfg
 
-echo "===== Configurar contraseña de root ====="
-passwd
-
-echo "===== Crear usuario ====="
-read -rp "Nombre de Usuario: " usuario
-
-# Guardar el nombre del usuario en un archivo para usarlo en extras
-echo "$usuario" > /opt/user
-
-useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner -s /bin/bash "$usuario"
-echo "===== Crear contraseña para $usuario ====="
-passwd "$usuario"
-
 chmod +x extras
-#./extras
-
-#grub-install /dev/sda
-#grub-mkconfig -o /boot/grub/grub.cfg
-#rm /etc/default/grub
-#mv ./grub_conf /etc/default/grub
-#grub-mkconfig -o /boot/grub/grub.cfg
-#
-#echo "===== Contraseña root ====="
-#passwd
-#
-#echo "===== Crear usuario: ======"
-#echo "Nombre de Usuario:"
-#read usuario
-#
-##crea un archivo user, se usa en extras
-#echo $usuario > /opt/user
-#
-#useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner -s /bin/bash $usuario && passwd $usuario
-#
-#chmod +x extras
 #./extras

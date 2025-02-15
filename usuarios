@@ -1,0 +1,14 @@
+#!/usr/bin/bash
+set -e -u
+
+echo "===== Configurar contraseña de root ====="
+passwd
+
+echo "===== Crear usuario ====="
+read -rp "Nombre de Usuario: " usuario
+
+useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner -s /bin/bash "$usuario"
+echo "===== Crear contraseña para $usuario ====="
+passwd "$usuario"
+
+./grub
