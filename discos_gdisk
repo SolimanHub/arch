@@ -4,9 +4,7 @@ set -euo pipefail
 echo -e "\nDiscos disponibles para trabajar:"
 echo "Selecciona uno (ej: sda):"
 echo
-
 lsblk -d -o NAME,SIZE,TYPE | grep disk
-
 echo
 read -p "Disco (ej. sda): " unidad
 DISCO="/dev/$unidad"
@@ -17,7 +15,7 @@ tamanio_mb=$((tamanio_bytes / 1024 / 1024))
 
 # Definir tamaños fijos y calcular espacio flexible
 swap_size_mb=2048
-overhead=$((1 + 100 + swap_size_mb))
+overhead=$((100 + swap_size_mb))  # Eliminamos el overhead de 1MB para la partición BIOS
 flexible=$((tamanio_mb - overhead))
 flexible_gb=$(( flexible / 1024 ))
 
@@ -51,27 +49,18 @@ o
 Y
 n
 1
-
-+1M
-EF02
-n
-2
-
 +100M
 EF00
 n
-3
-
+2
 +${swap_size_mb}M
 8200
 n
-4
-
+3
 +${home_mb}M
 8300
 n
-5
-
+4
 
 8300
 w
@@ -79,21 +68,20 @@ Y
 EOF
 
 echo -e "\n=== Formateando particiones ==="
-mkfs.ext4 "${DISCO}5"      # Raíz
-mkfs.ext4 "${DISCO}4"      # Home
-mkfs.fat -F32 "${DISCO}2"   # EFI
-mkswap "${DISCO}3"         # Swap
+mkfs.ext4 "${DISCO}4"      # Raíz
+mkfs.ext4 "${DISCO}3"      # Home
+mkfs.fat -F32 "${DISCO}1"   # EFI
+mkswap "${DISCO}2"         # Swap
 
 echo -e "\n=== Montando particiones ==="
-mount "${DISCO}5" /mnt
+mount "${DISCO}4" /mnt
 mkdir -p /mnt/home
-mount "${DISCO}4" /mnt/home
+mount "${DISCO}3" /mnt/home
 mkdir -p /mnt/boot/EFI
-mount "${DISCO}2" /mnt/boot/EFI
+mount "${DISCO}1" /mnt/boot/EFI
 
 echo -e "\nActivando swap..."
-swapon "${DISCO}3"
+swapon "${DISCO}2"
 
 echo -e "\nProceso finalizado."
 ./paquetes
-
