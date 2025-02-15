@@ -96,3 +96,4 @@ swapon "${DISCO}3"
 
 echo -e "\nProceso finalizado."
 ./paquetes
+
