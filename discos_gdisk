@@ -9,13 +9,18 @@ echo
 read -p "Disco (ej. sda): " unidad
 DISCO="/dev/$unidad"
 
+if [ ! -b "$DISCO" ]; then
+    echo "Error: La unidad '$DISCO' no existe."
+    exit 1
+fi
+
 # Obtener tamaño total del disco en MB
 tamanio_bytes=$(blockdev --getsize64 "$DISCO")
 tamanio_mb=$((tamanio_bytes / 1024 / 1024))
 
 # Definir tamaños fijos y calcular espacio flexible
 swap_size_mb=2048
-overhead=$((100 + swap_size_mb))  # Eliminamos el overhead de 1MB para la partición BIOS
+overhead=$((swap_size_mb)) 
 flexible=$((tamanio_mb - overhead))
 flexible_gb=$(( flexible / 1024 ))
 
@@ -49,7 +54,7 @@ o
 Y
 n
 1
-+100M
++550M
 EF00
 n
 2
@@ -69,16 +74,19 @@ EOF
 
 echo -e "\n=== Formateando particiones ==="
 mkfs.ext4 "${DISCO}4"      # Raíz
+sync
 mkfs.ext4 "${DISCO}3"      # Home
+sync
 mkfs.fat -F32 "${DISCO}1"   # EFI
+sync
 mkswap "${DISCO}2"         # Swap
 
 echo -e "\n=== Montando particiones ==="
 mount "${DISCO}4" /mnt
 mkdir -p /mnt/home
 mount "${DISCO}3" /mnt/home
-mkdir -p /mnt/boot/EFI
-mount "${DISCO}1" /mnt/boot/EFI
+mkdir -p /mnt/boot
+mount "${DISCO}1" /mnt/boot
 
 echo -e "\nActivando swap..."
 swapon "${DISCO}2"
