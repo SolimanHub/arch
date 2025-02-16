@@ -2,14 +2,15 @@
 set -euo pipefail
 
 # --- Selección de kernel ---
-select_kernel() {
+echo "Seleccionando kernel..."
     echo "===== Selección de Kernel ====="
     echo "1) Linux Standard (default)"
     echo "2) Linux-Zen (mejor para escritorio)"
     echo "3) Linux-LTS (larga vida útil)"
     echo "4) Todos los kernels anteriores"
-    read -rp "Seleccione kernel [1-4]: " kernel_choice
 
+select_kernel() {
+    read -rp "Seleccione kernel [1-4]: " kernel_choice
     case "$kernel_choice" in
         2) echo "linux-zen linux-zen-headers" ;;
         3) echo "linux-lts linux-lts-headers" ;;
@@ -19,7 +20,6 @@ select_kernel() {
 }
 
 # --- Instalación base ---
-echo "Seleccionando kernel..."
 selected_kernels=$(select_kernel)
 
 # Mostrar los kernels seleccionados
