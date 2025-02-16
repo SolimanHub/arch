@@ -1,16 +1,16 @@
 #!/usr/bin/bash
 set -e -u
 
-# Actualizar las bases para evitar errores
-pacman -Syy
-pacman -S grub efibootmgr --noconfirm
-
 # Mostrar las unidades disponibles para que el usuario seleccione dónde instalar GRUB
 echo "===== Unidades disponibles para instalar GRUB ====="
 lsblk -d -o NAME,SIZE,MODEL
 echo
 read -rp "Ingrese el nombre de la unidad (ejemplo: sda): " disk
 GRUB_DISK="/dev/$disk"
+
+# Actualizar las bases para evitar errores
+pacman -Syy
+pacman -S grub efibootmgr --noconfirm
 
 # Verificar si existe una partición EFI montada en /boot/EFI
 if ! mountpoint -q /boot/EFI; then
@@ -38,4 +38,4 @@ echo "Regenerando configuración de GRUB..."
 grub-mkconfig -o /boot/grub/grub.cfg
 
 # Instalar paquetes extras
-# ./extras
+./extras
