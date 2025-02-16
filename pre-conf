@@ -7,6 +7,7 @@ cp conf /mnt
 cp grub /mnt
 cp ./configs/grub_conf /mnt
 cp extras /mnt
+cp usuarios /mnt
 cp ./configs/lightdm.conf /mnt
 cp -r Paquetes /mnt
 cp -r Luv /mnt
