@@ -89,8 +89,8 @@ echo -e "\n=== Montando particiones ==="
 mount "${DISCO}4" /mnt
 mkdir -p /mnt/home
 mount "${DISCO}3" /mnt/home
-mkdir -p /mnt/boot
-mount "${DISCO}1" /mnt/boot
+mkdir -p /mnt/boot/EFI
+mount "${DISCO}1" /mnt/boot/EFI
 
 echo -e "\nActivando swap..."
 swapon "${DISCO}2"
