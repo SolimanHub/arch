@@ -75,7 +75,6 @@ pacman -S --needed --noconfirm \
 
 # ===== Instalar controladores y kernel =====
 detect_gpu_drivers
-select_kernel
 
 # ===== Selección de entornos gráficos (actualizado) =====
 echo "<<==============================>>"
