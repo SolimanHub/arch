@@ -125,6 +125,32 @@ fi
 pacman -S --noconfirm zsh
 chsh -s /bin/zsh "${SUDO_USER:-$USER}"
 
+# Configuración de lightdm
+rm /etc/lightdm/lightdm.conf
+mv lightdm.conf /etc/lightdm/
+echo "background=/usr/share/backgrounds/wall1.png" >> /etc/lightdm/lightdm-gtk-greeter.conf
+
+# Configuración para el touchpad
+mv 50-synaptics.conf /etc/X11/xorg.conf.d/
+
+# Instalación de fuentes
+mv fonts/* /usr/share/fonts/
+rm -r fonts/
+
+# Cargar paquete de iconos
+mv Luv /usr/share/icons/
+
+# Limpieza de archivos importados
+rm conf grub extras
+rm -r Paquetes
+
+# Comando ves carga y configuración
+cd /opt/
+git clone https://github.com/SolimanHub/comando_ves
+ln -s /opt/comando_ves/ves /usr/bin/ves
+
+cd /
+
 # Configurar servicios
 systemctl enable NetworkManager
 [[ "$MINIMAL_INSTALL" != "s" ]] && systemctl enable lightdm
