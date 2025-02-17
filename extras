@@ -108,20 +108,6 @@ if [[ "$MINIMAL_INSTALL" != "s" ]]; then
         docker docker-compose nodejs npm go rust \
         python python-pip base-devel
     
-    # Instalación de yay para AUR (corregido: ejecutar como usuario)
-    if ! sudo -u "$USER_NAME" command -v yay &>/dev/null; then
-        sudo -u "$USER_NAME" git clone https://aur.archlinux.org/yay.git /tmp/yay
-        (cd /tmp/yay && sudo -u "$USER_NAME" makepkg -si --noconfirm)
-        rm -rf /tmp/yay
-    fi
-    
-    # Paquetes AUR recomendados
-    sudo -u "$USER_NAME" yay -S --noconfirm \
-        nerd-fonts-fira-code \
-        papirus-icon-theme \
-	pop-gtk-theme \
-        tela-icon-theme \
-        zsh-theme-powerlevel10k
 fi
 
 # Configuración de lightdm
