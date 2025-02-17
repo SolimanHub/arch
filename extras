@@ -151,6 +151,5 @@ if [[ "$MINIMAL_INSTALL" != "s" ]]; then
     done
 fi
 
-echo -e "\e[34m¡Instalación completada con éxito!"
-mv yay_install "$USER_HOME"
+echo -e "\e[31m¡Instalación completada con éxito!"
 echo "Para agregar AUR ejecutar ./yay_install"
