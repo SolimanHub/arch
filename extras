@@ -126,7 +126,10 @@ fi
 
 # Configuración de lightdm
 rm /etc/lightdm/lightdm.conf
+rm /etc/sudoers
+
 mv lightdm.conf /etc/lightdm/
+mv sudoers /etc/
 echo -e "\e[31mbackground=/usr/share/backgrounds/wall1.png" >> /etc/lightdm/lightdm-gtk-greeter.conf
 
 # Configuración para el touchpad
@@ -141,12 +144,11 @@ mv Luv /usr/share/icons/
 
 # Limpieza de archivos importados
 rm conf grub extras usuarios
-rm -r Paquetes
 
 # Comando ves carga y configuración
 cd /opt/
-git clone https://github.com/SolimanHub/comando_ves
-ln -s /opt/comando_ves/ves /usr/bin/ves
+sudo git clone https://github.com/SolimanHub/comando_ves
+sudo ln -s /opt/comando_ves/ves /usr/bin/ves
 
 cd /
 

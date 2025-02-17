@@ -1,18 +1,14 @@
 #!/usr/bin/bash
 set -e -u
 
-cp ./configs/sudoers /mnt
-cp ./configs/50-synaptics.conf /mnt
+cp ./configs/* /mnt
 cp conf /mnt
 cp grub /mnt
-cp ./configs/grub_conf /mnt
 cp extras /mnt
 cp usuarios /mnt
-cp ./configs/lightdm.conf /mnt
-cp -r Paquetes /mnt
 cp -r Luv /mnt
 cp -r fonts/ /mnt
 
-echo "====== ./conf ====="
+echo -e "\e[31m====== ./conf ====="
 
-arch-chroot /mnt /conf
+arch-chroot /mnt
