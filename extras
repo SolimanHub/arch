@@ -11,7 +11,7 @@ USER_NAME="${SUDO_USER:-$USER}"
 
 # ===== Detección automática de drivers gráficos =====
 detect_gpu_drivers() {
-    echo "Detectando controladores gráficos..."
+    echo -e "\e[31mDetectando controladores gráficos..."
     local gpu_info=$(lspci | grep -i vga)
     
     if grep -qi "intel" <<< "$gpu_info"; then
@@ -21,22 +21,21 @@ detect_gpu_drivers() {
     elif grep -qi "nvidia" <<< "$gpu_info"; then
         pacman -S --noconfirm nvidia nvidia-utils nvidia-settings cuda
     else
-        echo "Usando controladores genéricos (modesetting)"
+        echo -e "\e[31mUsando controladores genéricos (modesetting)"
     fi
 }
 
 # --- Selección de microcódigo ---
-echo "Seleccione su procesador para instalar el microcódigo adecuado:"
-echo "<<==============================>>"
-echo "1) Intel"
-echo "2) AMD"
+echo -e "\e[31mSeleccione su procesador para instalar el microcódigo adecuado:"
+echo -e "\e[31m1) Intel"
+echo -e "\e[31m2) AMD"
 read -rp "Opción [1/2]: " proc_choice
 
 microcode=""
 case "$proc_choice" in
     1) microcode="intel-ucode" ;;
     2) microcode="amd-ucode" ;;
-    *) echo "Opción no válida, no se instalará microcódigo." ;;
+    *) echo -e "\e[31mOpción no válida, no se instalará microcódigo." ;;
 esac
 
 if [[ -n "$microcode" ]]; then  # Corregido: verificar antes de instalar
@@ -44,14 +43,14 @@ if [[ -n "$microcode" ]]; then  # Corregido: verificar antes de instalar
 fi
 
 # ===== Instalación mínima =====
-echo "<<==============================>>"
+echo -e "\e[31m<<==============================>>"
 read -rp "¿Desea instalación mínima? [S/n]: " MINIMAL_INSTALL
 MINIMAL_INSTALL=${MINIMAL_INSTALL,,}
 
 # ===== Paquetes base esenciales =====
 pacman -S --needed --noconfirm \
     xorg-server xorg-xinit xorg-xrandr \
-    sudo bash-completion nano curl wget git \
+    sudo bash-completion curl wget git \
     man-db man-pages texinfo pciutils \
     wpa_supplicant dialog xf86-input-synaptics htop \
     gvfs gvfs-afc gvfs-mtp 
@@ -60,17 +59,17 @@ pacman -S --needed --noconfirm \
 detect_gpu_drivers
 
 # ===== Selección de entornos gráficos (actualizado) =====
-echo "<<==============================>>"
+echo -e "\e[31m<<==============================>>"
 if [[ "$MINIMAL_INSTALL" != "s" ]]; then
-    echo "===== Selección de entornos gráficos ====="
-    echo "1) i3wm (Default)"
-    echo "2) XFCE4"
-    echo "3) GNOME"
-    echo "4) KDE Plasma"
-    echo "5) Hyprland (Wayland moderno)"
-    echo "6) GNOME Minimal"
-    echo "7) Sway (i3 en Wayland)"
-    echo "8) MATE (Clásico ligero)"
+    echo -e "\e[31m===== Selección de entornos gráficos ====="
+    echo -e "\e[31m1) i3wm (Default)"
+    echo -e "\e[31m2) XFCE4"
+    echo -e "\e[31m3) GNOME"
+    echo -e "\e[31m4) KDE Plasma"
+    echo -e "\e[31m5) Hyprland (Wayland moderno)"
+    echo -e "\e[31m6) GNOME Minimal"
+    echo -e "\e[31m7) Sway (i3 en Wayland)"
+    echo -e "\e[31m8) MATE (Clásico ligero)"
     read -rp "Opciones (separar por comas): " desktop_choices
 
     IFS=',' read -ra choices <<< "${desktop_choices:-$DEFAULT_DESKTOP}"
@@ -85,10 +84,14 @@ if [[ "$MINIMAL_INSTALL" != "s" ]]; then
             6) pacman -S --noconfirm gnome-shell gnome-control-center gdm ;;
             7) pacman -S --noconfirm sway swaylock swayidle wofi ;;
             8) pacman -S --noconfirm mate mate-extra mate-media ;;
-            *) echo "Opción $choice omitida" ;;
+            *) echo -e "\e[31mOpción $choice omitida" ;;
         esac
     done
 fi
+
+# Configuración básica de zsh
+pacman -S --noconfirm zsh
+chsh -s /bin/zsh "${SUDO_USER:-$USER}"
 
 # ===== Paquetes opcionales (solo instalación completa) =====
 if [[ "$MINIMAL_INSTALL" != "s" ]]; then
@@ -98,7 +101,7 @@ if [[ "$MINIMAL_INSTALL" != "s" ]]; then
         networkmanager network-manager-applet \
         pipewire pipewire-pulse pipewire-alsa pipewire-jack wireplumber \
         pavucontrol \
-        kitty thunar firefox neovim
+        kitty alacritty thunar firefox neovim
     
     # Herramientas de desarrollo
     pacman -S --noconfirm \
@@ -116,19 +119,15 @@ if [[ "$MINIMAL_INSTALL" != "s" ]]; then
     sudo -u "$USER_NAME" yay -S --noconfirm \
         nerd-fonts-fira-code \
         papirus-icon-theme \
+	pop-gtk-theme \
         tela-icon-theme \
         zsh-theme-powerlevel10k
 fi
 
-# ===== Configuraciones post-instalación =====
-# Configuración básica de zsh
-pacman -S --noconfirm zsh
-chsh -s /bin/zsh "${SUDO_USER:-$USER}"
-
 # Configuración de lightdm
 rm /etc/lightdm/lightdm.conf
 mv lightdm.conf /etc/lightdm/
-echo "background=/usr/share/backgrounds/wall1.png" >> /etc/lightdm/lightdm-gtk-greeter.conf
+echo -e "\e[31mbackground=/usr/share/backgrounds/wall1.png" >> /etc/lightdm/lightdm-gtk-greeter.conf
 
 # Configuración para el touchpad
 mv 50-synaptics.conf /etc/X11/xorg.conf.d/
@@ -141,7 +140,7 @@ rm -r fonts/
 mv Luv /usr/share/icons/
 
 # Limpieza de archivos importados
-rm conf grub extras
+rm conf grub extras usuarios
 rm -r Paquetes
 
 # Comando ves carga y configuración
@@ -178,4 +177,4 @@ input { kb_layout = es }
 EOF
 fi
 
-echo "¡Instalación completada con éxito!"
+echo -e "\e[34m¡Instalación completada con éxito!"
