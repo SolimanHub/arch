@@ -11,7 +11,7 @@ USER_NAME="${SUDO_USER:-$USER}"
 
 # ===== Detección automática de drivers gráficos =====
 detect_gpu_drivers() {
-    echo -e "\e[31mDetectando controladores gráficos..."
+    echo "Detectando controladores gráficos..."
     local gpu_info=$(lspci | grep -i vga)
     
     if grep -qi "intel" <<< "$gpu_info"; then
@@ -21,21 +21,21 @@ detect_gpu_drivers() {
     elif grep -qi "nvidia" <<< "$gpu_info"; then
         pacman -S --noconfirm nvidia nvidia-utils nvidia-settings cuda
     else
-        echo -e "\e[31mUsando controladores genéricos (modesetting)"
+        echo "Usando controladores genéricos (modesetting)"
     fi
 }
 
 # --- Selección de microcódigo ---
-echo -e "\e[31mSeleccione su procesador para instalar el microcódigo adecuado:"
-echo -e "\e[31m1) Intel"
-echo -e "\e[31m2) AMD"
+echo "Seleccione su procesador para instalar el microcódigo adecuado:"
+echo "1) Intel"
+echo "2) AMD"
 read -rp "Opción [1/2]: " proc_choice
 
 microcode=""
 case "$proc_choice" in
     1) microcode="intel-ucode" ;;
     2) microcode="amd-ucode" ;;
-    *) echo -e "\e[31mOpción no válida, no se instalará microcódigo." ;;
+    *) echo "Opción no válida, no se instalará microcódigo." ;;
 esac
 
 if [[ -n "$microcode" ]]; then  # Corregido: verificar antes de instalar
@@ -43,7 +43,7 @@ if [[ -n "$microcode" ]]; then  # Corregido: verificar antes de instalar
 fi
 
 # ===== Instalación mínima =====
-echo -e "\e[31m<<==============================>>"
+echo "<<==============================>>"
 read -rp "¿Desea instalación mínima? [s/N]: " MINIMAL_INSTALL
 MINIMAL_INSTALL=${MINIMAL_INSTALL,,}
 
@@ -59,17 +59,17 @@ pacman -S --needed --noconfirm \
 detect_gpu_drivers
 
 # ===== Selección de entornos gráficos (actualizado) =====
-echo -e "\e[31m<<==============================>>"
+echo "<<==============================>>"
 if [[ "$MINIMAL_INSTALL" != "s" ]]; then
-    echo -e "\e[31m===== Selección de entornos gráficos ====="
-    echo -e "\e[31m1) i3wm (Default)"
-    echo -e "\e[31m2) XFCE4"
-    echo -e "\e[31m3) GNOME"
-    echo -e "\e[31m4) KDE Plasma"
-    echo -e "\e[31m5) Hyprland (Wayland moderno)"
-    echo -e "\e[31m6) GNOME Minimal"
-    echo -e "\e[31m7) Sway (i3 en Wayland)"
-    echo -e "\e[31m8) MATE (Clásico ligero)"
+    echo "===== Selección de entornos gráficos ====="
+    echo "1) i3wm (Default)"
+    echo "2) XFCE4"
+    echo "3) GNOME"
+    echo "4) KDE Plasma"
+    echo "5) Hyprland (Wayland moderno)"
+    echo "6) GNOME Minimal"
+    echo "7) Sway (i3 en Wayland)"
+    echo "8) MATE (Clásico ligero)"
     read -rp "Opciones (separar por comas): " desktop_choices
 
     IFS=',' read -ra choices <<< "${desktop_choices:-$DEFAULT_DESKTOP}"
@@ -84,7 +84,7 @@ if [[ "$MINIMAL_INSTALL" != "s" ]]; then
             6) pacman -S --noconfirm gnome-shell gnome-control-center gdm ;;
             7) pacman -S --noconfirm sway swaylock swayidle wofi ;;
             8) pacman -S --noconfirm mate mate-extra mate-media ;;
-            *) echo -e "\e[31mOpción $choice omitida" ;;
+            *) echo "Opción $choice omitida" ;;
         esac
     done
 fi
@@ -113,7 +113,7 @@ fi
 # Configuración de lightdm
 rm /etc/lightdm/lightdm.conf
 mv lightdm.conf /etc/lightdm/
-echo -e "\e[31mbackground=/usr/share/backgrounds/wall1.png" >> /etc/lightdm/lightdm-gtk-greeter.conf
+echo "background=/usr/share/backgrounds/wall1.png" >> /etc/lightdm/lightdm-gtk-greeter.conf
 
 # Configuración para el touchpad
 mv 50-synaptics.conf /etc/X11/xorg.conf.d/

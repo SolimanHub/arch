@@ -2,7 +2,7 @@
 set -e -u
 
 # Mostrar las unidades disponibles para que el usuario seleccione dónde instalar GRUB
-echo -e "\e[31m===== Unidades disponibles para instalar GRUB ====="
+echo "===== Unidades disponibles para instalar GRUB ====="
 lsblk -d -o NAME,SIZE,MODEL
 echo
 read -rp "Ingrese el nombre de la unidad (ejemplo: sda): " disk
@@ -14,17 +14,17 @@ pacman -S grub efibootmgr --noconfirm
 
 # Verificar si existe una partición EFI montada en /boot/EFI
 if ! mountpoint -q /boot/EFI; then
-    echo -e "\e[31mError: La partición EFI no está montada en /boot/EFI."
-    echo -e "\e[31mAsegúrate de haber creado y montado una partición EFI antes de continuar."
+    echo "Error: La partición EFI no está montada en /boot/EFI."
+    echo "Asegúrate de haber creado y montado una partición EFI antes de continuar."
     exit 1
 fi
 
 # Instalar GRUB en modo UEFI
-echo -e "\e[31mInstalando GRUB en modo UEFI..."
+echo "Instalando GRUB en modo UEFI..."
 grub-install --target=x86_64-efi --efi-directory=/boot/EFI --bootloader-id=GRUB --removable
 
 # Generar la configuración inicial de GRUB
-echo -e "\e[31mGenerando configuración de GRUB..."
+echo "Generando configuración de GRUB..."
 grub-mkconfig -o /boot/grub/grub.cfg
 
 # Reemplazar el archivo de configuración de GRUB
@@ -34,7 +34,7 @@ fi
 mv ./grub_conf /etc/default/grub
 
 # Regenerar la configuración de GRUB con el nuevo archivo
-echo -e "\e[31mRegenerando configuración de GRUB..."
+echo "Regenerando configuración de GRUB..."
 grub-mkconfig -o /boot/grub/grub.cfg
 
 # Instalar paquetes extras

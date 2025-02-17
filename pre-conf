@@ -10,6 +10,6 @@ cp yay_install /mnt
 cp -r Luv /mnt
 cp -r fonts/ /mnt
 
-echo -e "\e[31m====== ./conf ====="
+echo "====== ./conf ====="
 
 arch-chroot /mnt
