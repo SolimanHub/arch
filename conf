@@ -3,6 +3,7 @@ set -euo pipefail
 
 # Verificar que el archivo sudoers existe antes de moverlo
 if [ -e /sudoers ]; then
+    rm /etc/sudoers
     mv /sudoers /etc/
 else
     echo "Advertencia: /sudoers no existe. Se omitirá el movimiento."

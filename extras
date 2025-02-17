@@ -112,10 +112,7 @@ fi
 
 # Configuración de lightdm
 rm /etc/lightdm/lightdm.conf
-rm /etc/sudoers
-
 mv lightdm.conf /etc/lightdm/
-mv sudoers /etc/
 echo -e "\e[31mbackground=/usr/share/backgrounds/wall1.png" >> /etc/lightdm/lightdm-gtk-greeter.conf
 
 # Configuración para el touchpad
