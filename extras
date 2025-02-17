@@ -165,5 +165,3 @@ fi
 echo -e "\e[34m¡Instalación completada con éxito!"
 mv yay_install "$USER_HOME"
 echo "Para agregar AUR ejecutar ./yay_install"
-cd "$USER_HOME"
-su "$USER_NAME"
