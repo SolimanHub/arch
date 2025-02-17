@@ -163,3 +163,4 @@ EOF
 fi
 
 echo -e "\e[34m¡Instalación completada con éxito!"
+mv yay_install "$USER_HOME"
