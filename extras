@@ -9,7 +9,7 @@ USER_HOME="/home/${SUDO_USER:-$USER}"
 USER_NAME="${SUDO_USER:-$USER}"
 # ===== Detección automática de drivers gráficos =====
 detect_gpu_drivers() {
-    echo "Detectando controladores gráficos..."
+    echo -e "\033[32mDetectando controladores gráficos...\033[0m"
     local gpu_info=$(lspci | grep -i vga)
     
     if grep -qi "intel" <<< "$gpu_info"; then
@@ -19,7 +19,7 @@ detect_gpu_drivers() {
     elif grep -qi "nvidia" <<< "$gpu_info"; then
         pacman -S --noconfirm --overwrite '*' nvidia nvidia-utils nvidia-settings cuda
     else
-        echo "Usando controladores genéricos (modesetting)"
+        echo -e "\033[32mUsando controladores genéricos (modesetting)\033[0m"
     fi
 }
 
@@ -29,13 +29,13 @@ detect_microcode() {
     vendor=$(grep -m1 -oP 'vendor_id\s*:\s*\K.*' /proc/cpuinfo | tr -d ' ')
     
     if [[ "$vendor" == *"GenuineIntel"* ]]; then
-        echo "Intel detectado. Instalando intel-ucode"
+        echo -e "\033[32mIntel detectado. Instalando intel-ucode\033[0m"
         microcode="intel-ucode"
     elif [[ "$vendor" == *"AuthenticAMD"* ]]; then
-        echo "AMD detectado. Instalando amd-ucode"
+        echo -e "\033[32mAMD detectado. Instalando amd-ucode\033[0m"
         microcode="amd-ucode"
     else
-        echo "Procesador no reconocido. No se instalará microcódigo."
+        echo -e "\033[32mProcesador no reconocido. No se instalará microcódigo.\033[0m"
         microcode=""
     fi
 }
@@ -49,7 +49,7 @@ if [[ -n "$microcode" ]]; then
 fi
 
 # ===== Instalación mínima =====
-echo "<<==============================>>"
+echo -e "\033[32m<<==============================>>\033[0m"
 read -rp "¿Desea instalación mínima? [s/N]: " MINIMAL_INSTALL
 MINIMAL_INSTALL=${MINIMAL_INSTALL,,}
 # ===== Paquetes base esenciales =====
@@ -84,7 +84,7 @@ fi
 # Configuración de lightdm
 rm /etc/lightdm/lightdm.conf
 mv lightdm.conf /etc/lightdm/
-echo "background=/usr/share/backgrounds/wall1.png" >> /etc/lightdm/lightdm-gtk-greeter.conf
+echo -e "\033[32mbackground=/usr/share/backgrounds/wall1.png\033[0m" >> /etc/lightdm/lightdm-gtk-greeter.conf
 # Configuración para el touchpad
 mv 50-synaptics.conf /etc/X11/xorg.conf.d/
 # Instalación de fuentes
@@ -105,34 +105,19 @@ systemctl enable NetworkManager
 # Configurar PipeWire (corregido: ejecutar como usuario)
 sudo -u "$USER_NAME" systemctl --user enable pipewire pipewire-pulse wireplumber
 sudo -u "$USER_NAME" systemctl --user start pipewire pipewire-pulse wireplumber
-# Configuración de kernel alternativo
-if pacman -Qi linux-zen &>/dev/null; then
-    cat > /etc/mkinitcpio.conf << EOF
-PRESETS=('default' 'fallback')
-COMPRESSION="zstd"
-EOF
-    mkinitcpio -P
-fi
-# Configuración de Hyprland (si está instalado)
-if pacman -Qi hyprland &>/dev/null; then
-    sudo -u "$USER_NAME" mkdir -p "${USER_HOME}/.config/hypr"
-    cat > "${USER_HOME}/.config/hypr/hyprland.conf" << EOF
-exec-once = waybar & dbus-update-activation-environment --systemd & hyprpaper
-monitor = ,preferred,auto,1
-input { kb_layout = es }
-EOF
-fi
-echo "<<==============================>>"
+
+echo -e "\033[32m<<==============================>>\033[0m"
+
 if [[ "$MINIMAL_INSTALL" != "s" ]]; then
-    echo "===== Selección de entornos gráficos ====="
-    echo "1) i3wm (Default)"
-    echo "2) XFCE4"
-    echo "3) GNOME"
-    echo "4) KDE Plasma"
-    echo "5) Hyprland (Wayland moderno)"
-    echo "6) GNOME Minimal"
-    echo "7) Sway (i3 en Wayland)"
-    echo "8) MATE (Clásico ligero)"
+    echo -e "\033[32m===== Selección de entornos gráficos =====\033[0m"
+    echo -e "\033[32m1) i3wm (Default)\033[0m"
+    echo -e "\033[32m2) XFCE4\033[0m"
+    echo -e "\033[32m3) GNOME\033[0m"
+    echo -e "\033[32m4) KDE Plasma\033[0m"
+    echo -e "\033[32m5) Hyprland (Wayland moderno)\033[0m"
+    echo -e "\033[32m6) GNOME Minimal\033[0m"
+    echo -e "\033[32m7) Sway (i3 en Wayland)\033[0m"
+    echo -e "\033[32m8) MATE (Clásico ligero)\033[0m"
     read -rp "Opciones (separar por comas): " desktop_choices
     IFS=',' read -ra choices <<< "${desktop_choices:-$DEFAULT_DESKTOP}"
     
@@ -151,5 +136,5 @@ if [[ "$MINIMAL_INSTALL" != "s" ]]; then
     done
 fi
 
-echo -e "\e[31m¡Instalación completada con éxito!"
-echo "Para agregar AUR ejecutar ./yay_install"
+echo -e "\033[32m¡Instalación completada con éxito!\033[0m"
+echo -e "\033[32mPara agregar AUR ejecutar ./yay_install\033[0m"
