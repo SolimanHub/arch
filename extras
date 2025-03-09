@@ -63,8 +63,9 @@ pacman -S --needed --noconfirm --overwrite '*' \
 detect_gpu_drivers
 # ===== Selección de entornos gráficos (actualizado) =====
 # Configuración básica de zsh
-pacman -S --noconfirm --overwrite '*' zsh
-chsh -s /bin/zsh "${SUDO_USER:-$USER}"
+pacman -S --noconfirm --overwrite '*' zsh zsh-completions
+chsh -s $(which zsh) "${SUDO_USER:-$USER}"
+
 # ===== Paquetes opcionales (solo instalación completa) =====
 if [[ "$MINIMAL_INSTALL" != "s" ]]; then
     pacman -S --noconfirm --overwrite '*' \
