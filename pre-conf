@@ -6,10 +6,9 @@ cp conf /mnt
 cp grub /mnt
 cp extras /mnt
 cp usuarios /mnt
+cp zsh /mnt
 cp -r ./otros /mnt
 cp -r Luv /mnt
 cp -r fonts/ /mnt
 
-echo "====== ./conf ====="
-
-arch-chroot /mnt
+arch-chroot /mnt /conf

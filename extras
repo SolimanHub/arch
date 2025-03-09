@@ -62,9 +62,6 @@ pacman -S --needed --noconfirm --overwrite '*' \
 # ===== Instalar controladores y kernel =====
 detect_gpu_drivers
 # ===== Selección de entornos gráficos (actualizado) =====
-# Configuración básica de zsh
-pacman -S --noconfirm --overwrite '*' zsh zsh-completions
-chsh -s $(which zsh) "${SUDO_USER:-$USER}"
 
 # ===== Paquetes opcionales (solo instalación completa) =====
 if [[ "$MINIMAL_INSTALL" != "s" ]]; then
@@ -93,8 +90,6 @@ mv fonts/* /usr/share/fonts/
 rm -r fonts/
 # Cargar paquete de iconos
 mv Luv /usr/share/icons/
-# Limpieza de archivos importados
-rm conf grub extras usuarios
 # Comando ves carga y configuración
 cd /opt/
 sudo git clone https://github.com/SolimanHub/comando_ves
@@ -137,5 +132,5 @@ if [[ "$MINIMAL_INSTALL" != "s" ]]; then
     done
 fi
 
-echo -e "\033[32m¡Instalación completada con éxito!\033[0m"
-echo -e "\033[32mPara agregar AUR ejecutar ./yay_install\033[0m"
+mv otros /home/${SUDO_USER:-$USER}
+./limpiar
