@@ -10,11 +10,16 @@ git pull
 git add --all .
 
 # Give a comment to the commit if you want
-echo "####################################"
-echo "Write your commit comment!"
-echo "####################################"
 
-read input
+if [ -z "$1" ]; then
+  echo -e "\033[31m###################################\033[0m"
+  echo -e "\033[31mWrite your commit comment!\033[0m"
+  echo -e "\033[31m###################################\033[0m"
+  read input
+else 
+  input=$1
+fi
+
 
 # Committing to the local repository with a message containing the time details and commit text
 
