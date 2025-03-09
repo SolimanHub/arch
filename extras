@@ -66,6 +66,10 @@ detect_gpu_drivers
 # ===== Paquetes opcionales (solo instalación completa) =====
 if [[ "$MINIMAL_INSTALL" != "s" ]]; then
     pacman -S --noconfirm --overwrite '*' \
+        qemu virt-manager virt-viewer dnsmasq \
+	vde2 bridge-utils openbsd-netcat \
+	ebtables iptables \
+	libguestfs \
         lightdm lightdm-gtk-greeter \
         noto-fonts noto-fonts-emoji ttf-firacode-nerd \
         networkmanager network-manager-applet \
@@ -96,9 +100,11 @@ sudo git clone https://github.com/SolimanHub/comando_ves
 sudo ln -s /opt/comando_ves/ves /usr/bin/ves
 cd /
 # Configurar servicios
+systemctl enable libvirtd.service
 systemctl enable NetworkManager
 [[ "$MINIMAL_INSTALL" != "s" ]] && systemctl enable lightdm
 # Configurar PipeWire (corregido: ejecutar como usuario)
+usermod -a -G libvirtd "$USER_NAME"
 sudo -u "$USER_NAME" systemctl --user enable pipewire pipewire-pulse wireplumber
 sudo -u "$USER_NAME" systemctl --user start pipewire pipewire-pulse wireplumber
 
