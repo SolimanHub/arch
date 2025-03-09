@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e -u
 
- 
 # checking if I have the latest files from github
 echo "Checking for newer files online first"
 git pull
@@ -17,7 +16,7 @@ if [ -z "$1" ]; then
   echo -e "\033[32m###################################\033[0m"
   read input
 else 
-  input=$1
+  input=$*
 fi
 
 
