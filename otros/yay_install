@@ -3,13 +3,15 @@ set -euo pipefail
 
 cd ~
 
+sudo pacman -S --noconfirm --overwrite '*'ebtables iptables
+
 git clone https://aur.archlinux.org/yay.git yay
 cd yay && makepkg -si --noconfirm
 rm -rf yay
 
-#yay -S --noconfirm \
-#    nerd-fonts-fira-code \
-#    papirus-icon-theme \
-#    pop-gtk-theme \
-#    tela-icon-theme \
-#    zsh-theme-powerlevel10k
+yay -S --noconfirm \
+    nerd-fonts-fira-code \
+    papirus-icon-theme \
+    pop-gtk-theme \
+    tela-icon-theme \
+    zsh-theme-powerlevel10k

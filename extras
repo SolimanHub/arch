@@ -68,7 +68,6 @@ if [[ "$MINIMAL_INSTALL" != "s" ]]; then
     pacman -S --noconfirm --overwrite '*' \
         qemu virt-manager virt-viewer dnsmasq \
 	vde2 bridge-utils openbsd-netcat \
-	ebtables iptables \
 	libguestfs \
         lightdm lightdm-gtk-greeter \
         noto-fonts noto-fonts-emoji ttf-firacode-nerd \
