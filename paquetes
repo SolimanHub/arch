@@ -1,26 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# --- Selección de kernel ---
-echo "Seleccionando kernel..."
-    echo "===== Selección de Kernel ====="
-    echo "1) Linux Standard (default)"
-    echo "2) Linux-Zen (mejor para escritorio)"
-    echo "3) Linux-LTS (larga vida útil)"
-    echo "4) Todos los kernels anteriores"
-
-select_kernel() {
-    read -rp "Seleccione kernel [1-4]: " kernel_choice
-    case "$kernel_choice" in
-        2) echo "linux-zen linux-zen-headers" ;;
-        3) echo "linux-lts linux-lts-headers" ;;
-        4) echo "linux linux-headers linux-zen linux-zen-headers linux-lts linux-lts-headers" ;;
-        *) echo "linux linux-headers" ;;
-    esac
-}
 
 # --- Instalación base ---
-selected_kernels=$(select_kernel)
+selected_kernels="selected_kernelsxyz"
 
 # Mostrar los kernels seleccionados
 echo "Kernels seleccionados: $selected_kernels"

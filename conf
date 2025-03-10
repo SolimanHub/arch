@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+hostname="temporalxyz"
+
 # Verificar que el archivo sudoers existe antes de moverlo
 if [ -e /sudoers ]; then
     mv /sudoers /etc/
@@ -26,7 +28,6 @@ hwclock -w
 #    hostname="dse-pc"
 #fi
 
-hostname="temporalxyz"
 echo "$hostname" > /etc/hostname
 
 # Ejecutar configuración de usuarios

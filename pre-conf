@@ -8,7 +8,8 @@ cp grub /mnt
 cp extras /mnt
 cp usuarios /mnt
 cp zsh /mnt
-cp -r ./otros /mnt
+cp refresh /mnt
+cp yay_install /mnt
 cp -r Luv /mnt
 cp -r fonts/ /mnt
 

@@ -61,14 +61,10 @@ pacman -S --needed --noconfirm --overwrite '*' \
     gvfs gvfs-afc gvfs-mtp 
 # ===== Instalar controladores y kernel =====
 detect_gpu_drivers
-# ===== Selección de entornos gráficos (actualizado) =====
 
 # ===== Paquetes opcionales (solo instalación completa) =====
 if [[ "$MINIMAL_INSTALL" != "s" ]]; then
     pacman -S --noconfirm --overwrite '*' \
-        qemu virt-manager virt-viewer dnsmasq \
-	vde2 bridge-utils openbsd-netcat \
-	libguestfs \
         lightdm lightdm-gtk-greeter \
         noto-fonts noto-fonts-emoji ttf-firacode-nerd \
         networkmanager network-manager-applet \
@@ -93,17 +89,18 @@ mv fonts/* /usr/share/fonts/
 rm -r fonts/
 # Cargar paquete de iconos
 mv Luv /usr/share/icons/
+mv yay_install "$USER_HOME" && chown -R "${SUDO_USER:-$USER}:" "$USER_HOME/yay_install"
+
 # Comando ves carga y configuración
 cd /opt/
 sudo git clone https://github.com/SolimanHub/comando_ves
 sudo ln -s /opt/comando_ves/ves /usr/bin/ves
 cd /
 # Configurar servicios
-systemctl enable libvirtd.service
 systemctl enable NetworkManager
+
 [[ "$MINIMAL_INSTALL" != "s" ]] && systemctl enable lightdm
 # Configurar PipeWire (corregido: ejecutar como usuario)
-usermod -a -G libvirtd "$USER_NAME"
 sudo -u "$USER_NAME" systemctl --user enable pipewire pipewire-pulse wireplumber
 sudo -u "$USER_NAME" systemctl --user start pipewire pipewire-pulse wireplumber
 
@@ -129,4 +126,6 @@ if [[ "$MINIMAL_INSTALL" != "s" ]]; then
 fi
 
 mv otros /home/${SUDO_USER:-$USER}
-./zsh
+
+./refresh
+

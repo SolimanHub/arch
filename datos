@@ -15,14 +15,11 @@ error_exit() {
 
 # Solicitar información
 echo -e "${GREEN}== Configuración de instalación de Arch Linux ==${NC}"
-
 # 1. Nombre del host
 while :; do
     read -p "Ingrese el nombre del host: " hostname
     [[ -z "$hostname" ]] && echo -e "${RED}El nombre del host no puede estar vacío!${NC}" || break
 done
-
-
 # 2. Password root
 while :; do
     read -sp "Ingrese la contraseña para root (no se mostrará): " root_pass
@@ -31,13 +28,11 @@ while :; do
     echo
     [[ "$root_pass" != "$root_pass_confirm" ]] && echo -e "${RED}Las contraseñas no coinciden!${NC}" || break
 done
-
 # 3. Nombre de usuario normal
 while :; do
     read -p "Ingrese nombre de usuario sin privilegios: " username
     [[ -z "$username" ]] && echo -e "${RED}El nombre de usuario no puede estar vacío!${NC}" || break
 done
-
 # 4. Password del usuario
 while :; do
     read -sp "Ingrese contraseña para $username (no se mostrará): " user_pass
@@ -46,58 +41,75 @@ while :; do
     echo
     [[ "$user_pass" != "$user_pass_confirm" ]] && echo -e "${RED}Las contraseñas no coinciden!${NC}" || break
 done
-
 # Mostrar resumen
 echo -e "${GREEN}\n== Configuración completa =="
 echo -e "Hostname: ${YELLOW}$hostname${NC}"
 echo -e "Usuario root: ${YELLOW}Password establecido${NC}"
 echo -e "Usuario normal: ${YELLOW}$username${NC}"
 echo -e "Password usuario: ${YELLOW}Password establecido${NC}${GREEN}\n== Continua con la instalación ==${NC}"
+# --- Selección de entorno gráfico ---
+echo -e "\033[32m===== Selección de entornos gráficos =====\033[0m"
+echo -e "\033[32m1) i3wm (Default)\033[32m"
+echo -e "2) XFCE4\033[0m"
+echo -e "3) GNOME\033[0m"
+echo -e "4) KDE Plasma\033[0m"
+echo -e "5) Hyprland (Wayland moderno)\033[0m"
+echo -e "6) GNOME Minimal\033[0m"
+echo -e "7) Sway (i3 en Wayland)\033[0m"
+echo -e "8) MATE (Clásico ligero)\033[0m"
 
-# Aquí irían los comandos de instalación usando las variables:
+select_desktop() {
+    read -rp "Opciones (separar por comas) [1]: " desktop_choices
+    desktop_choices=${desktop_choices:-1}  # Valor por defecto
+    
+    local cleaned_choices=()
+    IFS=',' read -ra raw_choices <<< "$desktop_choices"
+    
+    for choice in "${raw_choices[@]}"; do
+        case "$(echo "$choice" | tr -d '[:space:]')" in
+            1|2|3|4|5|6|7|8)
+                cleaned_choices+=("$choice")
+                ;;
+            *)
+                echo -e "${RED}Opción '$choice' inválida. Usando default (1).${NC}"
+                cleaned_choices=(1)
+                break
+                ;;
+        esac
+    done
+    
+    echo "${cleaned_choices[*]}" | tr ' ' ','
+}
 
+desktop_choices=$(select_desktop)
+
+# --- Selección de kernel ---
+echo "Seleccionando kernel..."
+echo "===== Selección de Kernel ====="
+echo "1) Linux Standard (default)"
+echo "2) Linux-Zen (mejor para escritorio)"
+echo "3) Linux-LTS (larga vida útil)"
+echo "4) Todos los kernels anteriores"
+
+select_kernel() {
+    read -rp "Seleccione kernel [1-4]: " kernel_choice
+    case "$kernel_choice" in
+        2) echo "linux-zen linux-zen-headers" ;;
+        3) echo "linux-lts linux-lts-headers" ;;
+        4) echo "linux linux-headers linux-zen linux-zen-headers linux-lts linux-lts-headers" ;;
+        *) echo "linux linux-headers" ;;
+    esac
+}
+
+kernel_packages=$(select_kernel)
+
+# Agregando info a los otros scripts
 root_pass_escaped=$(sed 's/[\/&]/\\&/g' <<< "$root_pass")
 user_pass_escaped=$(sed 's/[\/&]/\\&/g' <<< "$user_pass")
-
 sed -i "s/temporalxyz/$hostname/g" conf
 sed -i "s/usuarioxyz/$username/g" usuarios
 sed -i "s/tu_password_root/$root_pass_escaped/g" usuarios
 sed -i "s/tu_password_usuario/$user_pass_escaped/g" usuarios
-
-echo -e "\033[32m===== Selección de entornos gráficos =====\033[0m"
-echo -e "\033[32m1) i3wm (Default)\033[0m"
-echo -e "\033[32m2) XFCE4\033[0m"
-echo -e "\033[32m3) GNOME\033[0m"
-echo -e "\033[32m4) KDE Plasma\033[0m"
-echo -e "\033[32m5) Hyprland (Wayland moderno)\033[0m"
-echo -e "\033[32m6) GNOME Minimal\033[0m"
-echo -e "\033[32m7) Sway (i3 en Wayland)\033[0m"
-echo -e "\033[32m8) MATE (Clásico ligero)\033[0m"
-
-valid_desktops="1 2 3 4 5 6 7 8"
-while true; do
-    read -rp "Opciones (separar por comas) [Default: 1]: " desktop_choices
-    
-    # Limpiar espacios y establecer default si está vacío
-    desktop_choices=$(echo "$desktop_choices" | xargs)  # Eliminar espacios sobrantes
-    desktop_choices=${desktop_choices:-1}  # Establecer 1 si está vacío
-    
-    # Convertir a array y validar cada opción
-    invalid=0
-    IFS=',' read -ra choices <<< "$desktop_choices"
-    
-    for choice in "${choices[@]}"; do
-        choice_clean=$(echo "$choice" | tr -d '[:space:]')
-        if ! [[ "$choice_clean" =~ ^[1-8]$ ]]; then
-            echo -e "${RED}Opción inválida: $choice_clean. Solo números del 1 al 8 permitidos.${NC}"
-            invalid=1
-            break
-        fi
-    done
-    
-    [ $invalid -eq 0 ] && break
-done
-
 sed -i "s/escritorioxyz/$desktop_choices/g" extras
-
+sed -i "s/selected_kernelsxyz/$kernel_packages/g" paquetes
 ./discos_gdisk
