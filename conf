@@ -37,4 +37,4 @@ echo "$hostname" > /etc/hostname
 
 # Ejecutar configuración de usuarios
 echo -e "\033[32m==== USUARIOS ====\033[0m"
-# ./usuarios
+./usuarios

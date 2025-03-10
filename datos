@@ -116,6 +116,9 @@ root_pass_escaped=$(sed 's/[\/&]/\\&/g' <<< "$root_pass")
 user_pass_escaped=$(sed 's/[\/&]/\\&/g' <<< "$user_pass")
 sed -i "s/temporalxyz/$hostname/g" conf
 sed -i "s/usuarioxyz/$username/g" usuarios
+sed -i "s/usuarioxyz/$username/g" extras
+sed -i "s/usuarioxyz/$username/g" zsh
+sed -i "s/usuarioxyz/$username/g" yay_install
 sed -i "s/tu_password_root/$root_pass_escaped/g" usuarios
 sed -i "s/tu_password_usuario/$user_pass_escaped/g" usuarios
 sed -i "s/selected_kernelsxyz/$kernel_packages/g" paquetes

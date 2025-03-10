@@ -1,9 +1,11 @@
 #!/bin/bash
 set -euo pipefail
-user_home="/home/$(ls --ignore lost*)"
+USER_HOME="/home/usuarioxyz"
+USER_NAME="usuarioxyz"
 
-cd "$user_home"
-sudo -u "$(ls /home/ --ignore lost*)" bash <<EOF
+cd "$USER_HOME"
+sudo -u "$USER_NAME" bash <<EOF
+  cd ~
   git clone https://aur.archlinux.org/yay.git yay
   cd yay && makepkg -si --noconfirm
   rm -rf yay

@@ -1,21 +1,22 @@
 #!/bin/bash 
 
-user_home="/home/$(ls --ignore lost*)"
+USER_HOME="/home/usuarioxyz"
+USER_NAME="usuarioxyz"
 
 # Configuración básica de zsh
-cd "$user_home"
+cd "$USER_HOME"
 pacman -S --noconfirm --overwrite '*'zsh zsh-completions
-chsh -s "$(command -v zsh)" "${SUDO_USER:-$USER}"
+chsh -s "$(command -v zsh)" "$USER_NAME"
 # Ejecutar comandos como usuario normal
-sudo -u "${SUDO_USER:-$USER}" zsh <<EOF
+sudo -u "$USER_NAME" zsh <<EOF
 # Instalar Oh My Zsh
 sh -c "\$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended
 # Clonar plugins
-git clone https://github.com/zsh-users/zsh-autosuggestions "\${ZSH_CUSTOM:-$user_home/.oh-my-zsh/custom}/plugins/zsh-autosuggestions"
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "\${ZSH_CUSTOM:-$user_home/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting"
+git clone https://github.com/zsh-users/zsh-autosuggestions "\${ZSH_CUSTOM:-$USER_HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions"
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "\${ZSH_CUSTOM:-$USER_HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting"
 
 # Configurar .zshrc
-sed -i 's/^plugins=.*/plugins=(git zsh-autosuggestions zsh-syntax-highlighting)/' "$user_home/.zshrc"
+sed -i 's/^plugins=.*/plugins=(git zsh-autosuggestions zsh-syntax-highlighting)/' "$USER_HOME/.zshrc"
 EOF
 
 echo -e "\033[32m==== YAY_INSTALL ====\033[0m"

@@ -5,8 +5,8 @@ cd /
 export LC_ALL=C
 DEFAULT_DESKTOP=1
 MINIMAL_INSTALL="instalacion_minimaxyz"  
-USER_HOME="/home/$(ls /home --ignore lost*)"
-USER_NAME="${SUDO_USER:-$USER}"
+USER_HOME="/home/usuarioxyz"
+USER_NAME="usuarioxyz"
 # ===== Detección automática de drivers gráficos =====
 detect_gpu_drivers() {
     echo -e "\033[32mDetectando controladores gráficos...\033[0m"
@@ -88,8 +88,7 @@ cp 50-synaptics.conf /etc/X11/xorg.conf.d/
 cp fonts/* /usr/share/fonts/
 #rm -r fonts/
 # Cargar paquete de iconos
-cp Luv /usr/share/icons/
-cp yay_install "$USER_HOME" && chown -R "${SUDO_USER:-$USER}:" "$USER_HOME/yay_install"
+cp yay_install "$USER_HOME" && chown -R "$USER_NAME:" "$USER_HOME/yay_install"
 
 # Comando ves carga y configuración
 cd /opt/

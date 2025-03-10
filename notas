@@ -3,3 +3,5 @@ create script dotfiles for mv and rm archive
 corregir e integrar gits
 
 :%s/\v^(\s*)echo\s+"(.*)"/\1echo -e "\\033[32m\2\\033[0m"/g
+
+en zsh se jode
