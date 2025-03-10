@@ -1,50 +1,97 @@
-# Instalación sencilla de ArchLinux
+# ArchLinux Auto-Installer 🚀
 
-ArchLinux es una distribución muy interesante con un abanico de posibilidades muy extenso, esto es normal en todas las distribuciones de Linux, pero como Arch en su estado puro es una distro “completamente vacía” esto ofrece la facilidad de personalización como ninguna otra.
+Script de automatización para instalación de Arch Linux con configuración personalizada.  
+*Simplifica el proceso de instalación y configuración en unos pocos pasos.*
 
-Al ser esto una ventaja, también es una desventaja para la distro misma, dado que muchos usuarios relacionan el Prompt (línea de comandos) con “difícil” cosa que es un error, si bien, esto tiene una curva de aprendizaje no lo podemos negar, pero todo tiene una curva de aprendizaje.
+---
 
-Uno de los principales inconvenientes de ArchLinux es que no cuenta con un instalador, lo que significa, para desgracia de muchos, que se debe usar exclusivamente la línea de comandos para realizar su respectiva instalación…
+## 📋 Requisitos Previos
+- **Medio de instalación**: USB con [Arch Linux ISO](https://archlinux.org/download/).
+- **Conexión a Internet**: Requerida durante la instalación.
+- **Conocimientos básicos**: Particiones, BIOS/UEFI, y terminal.
 
-Cosa que no es difícil, pero es tediosa (al menos para mi) por lo que muchos usuarios avanzados optan por desarrollar sus propios scripts personalizados para dicha instalación, con lo que logran economizar sustancialmente el tiempo de instalación y configuración del mismo.
+---
 
-En este espacio se encuentra mi script de instalacion con mi configuracion personal, usted puede clonar dicho script y modificarlo a su conveniencia.
+## 🛠️ Instrucciones de Uso
 
-## Pasos a seguir:
+### 1. Preparar el Entorno Live
+1. Arranque desde el USB de Arch Linux.
+2. Ejecute los siguientes comandos:
 
-Una vez que iniciado el boot de ArchLinux y se le muestra en el prompt `root@archiso ~ # _`
+```bash
+pacman -Syy                # Actualizar repositorios
+pacman -S git              # Instalar Git (repetir si falla)
+```
+> Es posible que deba repetir este paso mas de una vez si falla la instalación de git.
 
-ejecute los siguientes comandos en el orden solicitado:
+### 2. Clonar el Repositorio
+```bash
+git clone https://github.com/SolimanHub/arch
+cd arch
+```
 
-> Nota: en esta guía no explicaré para qué sirve cada comando.
+### 3. Iniciar la Instalación
+```bash
+./start
+```
 
-- `pacman -Syy`
-- `pacman -S git` ( si este le muestra error, volver a ejecutarlo)
-- `git clone https://github.com/SolimanHub/arch`
-- `cd arch`
-- `./main` (T = este tomará tiempo)
-- Se le pregunta si desea particionar el disco de forma manual, escriba 's' para si ó 'n' para no (se recomienda 'n' para maquinas virtuales)
-- Se le muestran los discos disponibles, seleccione uno escribiendo el nombre especifico de la unidad `sdX` ( ejem `sda` )
+---
 
-    Se crearan 4 particiones raiz, home, EFI y una particion de 1M para la bios
+## 🧩 Flujo de los Scripts
+El proceso se ejecuta en cascada:
 
-- `./conf` (T)
-- Introduzca la contraseña del usuario root
-- Introduzca nombre del nuevo usuario no root
-- Introduzca la contraseña del usuario no root
-- `./user_conf`
-- `exit`
-- `exit`
-- `reboot` en caso de no reiniciar, volver a ejecutar `exit` -> `reboot`
+1. **`datos`**  
+   - Solicita: nombre de host, contraseñas, entorno gráfico y kernel.
+2. **`discos_gdisk`**  
+   - Crea particiones: `/`, `/home`, Swap (2 GB), EFI (550 MB).
+3. **`paquetes`**  
+   - Instala paquetes base y kernels.
+4. **`pre-conf`**  
+   - Copia archivos de configuración al sistema nuevo.
+5. **`conf`**  
+   - Configura zona horaria, locales y hostname.
+6. **`usuarios`**  
+   - Crea usuarios.
+7. **`grub`**  
+   - Instala GRUB.
+8. **`extras`**  
+   - Gestiona configuraciones críticas post-instalación, optimizando el sistema según tu hardware y preferencias..
+9. **`refresh`**  
+   - Retorna valores pre-instalacion de los scripts.
+10. **`zsh`**  
+   - Instala ZSH + plugins.
+11. **`yay_install`**  
+   - Configura AUR y paquetes.
+12. **`limpiar`**  
+   - Elimina los scripts de la instalacion.
 
-## Usar el sistema
+---
 
-Eso seria todo, ahora solo basta elegir usar i3 (recomendado para desarrolladores) ó xfce4 al iniciar el sistema.
+## 🌟 Características Clave
+- **Particionado automático**: `/`, `/home`, Swap, EFI.
+- **8 entornos gráficos**: i3wm (default), GNOME, KDE, etc.
+- **Drivers automáticos**: NVIDIA, AMD, Intel.
+- **Post-instalación**: ZSH, YAY (AUR), temas personalizados.
 
-Introducir su contraseña y listo ;)
+---
 
-Este Script facilita el proceso de instalación y puede ser utilizado sin inconveniente, pero esta incompleto, por lo cual aún puede ser difícil de manejar para algunos usuarios, esto será corregido algun dia xD
+## ⚠️ Notas
+- **Para VMs**: Usar particionado automático (opción `n`).
+- **Errores comunes**:
+  - Si `git clone` falla: ejecutar `pacman -Syy` nuevamente.
+  - Verificar conexión a internet.
 
-## Dudas o sugerencias 
+---
 
-    Telegram: @Obumbrata
+## 🛠️ Scripts Adicionales (En Desarrollo)
+| Script          | Función                             |
+|-----------------|-------------------------------------|
+| `gits`          | Clona configuraciones personalizadas|
+
+---
+
+## 📞 Soporte
+- **Telegram**: [@Softliman](https://t.me/Softliman)
+- **GitHub Issues**: [Reportar errores](https://github.com/SolimanHub/arch/issues)
+---
+
