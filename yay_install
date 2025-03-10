@@ -20,4 +20,4 @@ EOF
 
 cd /
 echo -e "\033[32m==== LIMPIAR ====\033[0m"
-#./limpiar
+./limpiar

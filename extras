@@ -125,5 +125,5 @@ if [[ "$MINIMAL_INSTALL" != "s" ]]; then
 fi
 
 echo -e "\033[32m==== REFRESH ====\033[0m"
-#./refresh
+./refresh
 
