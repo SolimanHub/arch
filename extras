@@ -81,7 +81,7 @@ fi
 # Configuración de lightdm
 rm /etc/lightdm/lightdm.conf
 cp lightdm.conf /etc/lightdm/
-echo -e "\033[32mbackground=/usr/share/backgrounds/wall1.png\033[0m" >> /etc/lightdm/lightdm-gtk-greeter.conf
+echo "background=/usr/share/backgrounds/wall1.png" >> /etc/lightdm/lightdm-gtk-greeter.conf
 # Configuración para el touchpad
 cp 50-synaptics.conf /etc/X11/xorg.conf.d/
 # Instalación de fuentes
@@ -100,8 +100,8 @@ systemctl enable NetworkManager
 
 [[ "$MINIMAL_INSTALL" != "s" ]] && systemctl enable lightdm
 # Configurar PipeWire (corregido: ejecutar como usuario)
-sudo -u "$USER_NAME" systemctl --user enable pipewire pipewire-pulse wireplumber
-sudo -u "$USER_NAME" systemctl --user start pipewire pipewire-pulse wireplumber
+systemctl enable pipewire pipewire-pulse wireplumber
+systemctl start pipewire pipewire-pulse wireplumber
 
 echo -e "\033[32m<<==============================>>\033[0m"
 

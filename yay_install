@@ -10,12 +10,12 @@ sudo -u "$USER_NAME" bash <<EOF
   cd yay && makepkg -si --noconfirm
   rm -rf yay
 
-  yay -S --noconfirm \
-      nerd-fonts-fira-code \
-      papirus-icon-theme \
-      pop-gtk-theme \
-      tela-icon-theme \
-      zsh-theme-powerlevel10k
+#  yay -S --noconfirm \
+#      nerd-fonts-fira-code \
+#      papirus-icon-theme \
+#      pop-gtk-theme \
+#      tela-icon-theme \
+#      zsh-theme-powerlevel10k
 EOF
 
 cd /
