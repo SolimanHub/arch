@@ -20,11 +20,13 @@ locale-gen
 hwclock -w
 
 # Solicitar al usuario el nombre de host
-read -rp "Ingrese el nombre de host deseado: " hostname
-if [ -z "$hostname" ]; then
-    echo "No se ingresó ningún nombre. Usando 'dse-pc' por defecto."
-    hostname="dse-pc"
-fi
+#read -rp "Ingrese el nombre de host deseado: " hostname
+#if [ -z "$hostname" ]; then
+#    echo "No se ingresó ningún nombre. Usando 'dse-pc' por defecto."
+#    hostname="dse-pc"
+#fi
+
+hostname="temporalxyz"
 echo "$hostname" > /etc/hostname
 
 # Ejecutar configuración de usuarios

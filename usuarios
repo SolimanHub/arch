@@ -1,14 +1,22 @@
 #!/usr/bin/bash
 set -e -u
 
+readonly root_pass="tu_password_root"
+readonly user_pass="tu_password_usuario"
+readonly usuario="usuarioxyz"
+
 echo "===== Configurar contraseña de root ====="
-passwd
+echo "root:$root_pass" | chpasswd
 
 echo "===== Crear usuario ====="
-read -rp "Nombre de Usuario: " usuario
+#read -rp "Nombre de Usuario: " usuario
 
 useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner -s /bin/bash "$usuario"
+
 echo "===== Crear contraseña para $usuario ====="
-passwd "$usuario"
+echo "$usuario:$user_pass" | chpasswd
+
+unset root_pass user_pass  # Limpia las variables de contraseña
 
 ./grub
+

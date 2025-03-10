@@ -2,7 +2,7 @@
 set -euo pipefail
 
 echo -e "\nDiscos disponibles para trabajar:"
-echo "Selecciona uno (ej: sda):"
+echo -e "\033[32mSelecciona uno (ej: sda):\033[0m"
 echo
 lsblk -d -o NAME,SIZE,TYPE | grep disk
 echo
@@ -10,7 +10,7 @@ read -p "Disco (ej. sda): " unidad
 DISCO="/dev/$unidad"
 
 if [ ! -b "$DISCO" ]; then
-    echo "Error: La unidad '$DISCO' no existe."
+    echo -e "\033[31mError: La unidad '$DISCO' no existe.\033[0m"
     exit 1
 fi
 
@@ -25,7 +25,7 @@ flexible=$((tamanio_mb - overhead))
 flexible_gb=$(( flexible / 1024 ))
 
 echo -e "\nTamaño total del disco: ${tamanio_mb} MB"
-echo "Espacio disponible para distribuir: ${flexible_gb} GB"
+echo -e "\033[32mEspacio disponible para distribuir: ${flexible_gb} GB\033[0m"
 
 # Solicitar porcentaje para home
 read -rp "Ingrese el porcentaje para /home (1-99, default 50%): " home_percent
@@ -33,7 +33,7 @@ home_percent=${home_percent:-50}
 
 # Validar entrada
 if [[ ! "$home_percent" =~ ^[0-9]+$ ]] || (( home_percent < 1 || home_percent > 99 )); then
-    echo "Valor inválido. Usando 50% por defecto."
+    echo -e "\033[32mValor inválido. Usando 50% por defecto.\033[0m"
     home_percent=50
 fi
 
@@ -44,10 +44,11 @@ root_gb=$(( root_mb / 1024 ))
 home_gb=$(( home_mb / 1024 ))
 
 echo -e "\nResumen de particiones:"
-echo "• Swap: 2 GB (2048 MB)"
-echo "• /home: ${home_gb} GB (${home_percent}%)"
-echo "• / (root): ${root_gb} GB"
+echo -e "\033[32m• Swap: 2 GB (2048 MB)\033[0m"
+echo -e "\033[32m• /home: ${home_gb} GB (${home_percent}%)\033[0m"
+echo -e "\033[32m• / (root): ${root_gb} GB\033[0m"
 
+echo -e "\033[32m========================\033[0m"
 echo -e "\n=== Particionado con gdisk ==="
 gdisk "$DISCO" <<EOF > gdisk.log 2>&1
 o
@@ -96,5 +97,5 @@ echo -e "\nActivando swap..."
 swapon "${DISCO}2"
 
 echo -e "\nProceso finalizado."
-echo "Sigue ./paquetes"
+echo -e "\033[32mSigue ./paquetes\033[0m"
 ./paquetes
