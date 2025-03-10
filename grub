@@ -40,4 +40,4 @@ grub-mkconfig -o /boot/grub/grub.cfg
 
 # Instalar paquetes extras
 echo -e "\033[32m==== EXTRAS ====\033[0m"
-./extras
+#./extras

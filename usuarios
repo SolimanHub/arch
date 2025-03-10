@@ -22,5 +22,5 @@ echo "===== Crear contraseña para $usuario ====="
 echo "$usuario:$user_pass" | chpasswd
 
 echo -e "\033[32m==== GRUB ====\033[0m"
-./grub
+#./grub
 

@@ -11,4 +11,4 @@ sed -i -E 's/[[:space:]]usuario="[^"]+"/[[:space:]]usuario="usuarioxyz"/' usuari
 sed -i -E 's/^[[:space:]]+desktop_choices="[[:digit:]]"/    desktop_choices="escritorioxyz"/' extras
 
 echo -e "\033[32m==== ZSH ====\033[0m"
-./zsh
+#./zsh

@@ -19,4 +19,4 @@ sed -i 's/^plugins=.*/plugins=(git zsh-autosuggestions zsh-syntax-highlighting)/
 EOF
 
 echo -e "\033[32m==== YAY_INSTALL ====\033[0m"
-./yay_install
+#./yay_install
