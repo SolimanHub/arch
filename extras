@@ -129,4 +129,4 @@ if [[ "$MINIMAL_INSTALL" != "s" ]]; then
 fi
 
 mv otros /home/${SUDO_USER:-$USER}
-./limpiar
+./zsh
