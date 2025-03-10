@@ -5,7 +5,8 @@ set -e -u
 echo "===== Unidades disponibles para instalar GRUB ====="
 lsblk -d -o NAME,SIZE,MODEL
 echo
-read -rp "Ingrese el nombre de la unidad (ejemplo: sda): " disk
+#read -rp "Ingrese el nombre de la unidad (ejemplo: sda): " disk
+disk="instalargruben"
 GRUB_DISK="/dev/$disk"
 
 # Actualizar las bases para evitar errores

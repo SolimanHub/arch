@@ -9,6 +9,8 @@ echo
 read -p "Disco (ej. sda): " unidad
 DISCO="/dev/$unidad"
 
+sed -i "s/instalargruben/$DISCO/g" grub
+
 if [ ! -b "$DISCO" ]; then
     echo -e "\033[31mError: La unidad '$DISCO' no existe.\033[0m"
     exit 1
