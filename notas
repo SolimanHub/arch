@@ -4,4 +4,7 @@ corregir e integrar gits
 
 :%s/\v^(\s*)echo\s+"(.*)"/\1echo -e "\\033[32m\2\\033[0m"/g
 
-en zsh se jode
+sacar comando ves de extras
+
+qemu-system-x86_64 -enable-kvm -m 6G -smp 4 -drive file=/home/rx/ollama_models/qemu/archlinux2_vm.qcow2,format=qcow2,if=virtio,bus=1 -netdev user,id=n1 -device virtio-net,netdev=n1 -device virtio-rng-pci -bios /usr/share/edk2/x64/OVMF.4m.fd -device intel-hda
+

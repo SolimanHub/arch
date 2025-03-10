@@ -90,18 +90,15 @@ cp fonts/* /usr/share/fonts/
 # Cargar paquete de iconos
 cp yay_install "$USER_HOME" && chown -R "$USER_NAME:" "$USER_HOME/yay_install"
 
-# Comando ves carga y configuración
-cd /opt/
-sudo git clone https://github.com/SolimanHub/comando_ves
-sudo ln -s /opt/comando_ves/ves /usr/bin/ves
-cd /
 # Configurar servicios
+systemctl daemon-reload 
 systemctl enable NetworkManager
 
 [[ "$MINIMAL_INSTALL" != "s" ]] && systemctl enable lightdm
-# Configurar PipeWire (corregido: ejecutar como usuario)
-systemctl enable pipewire pipewire-pulse wireplumber
-systemctl start pipewire pipewire-pulse wireplumber
+
+# Configurar PipeWire
+systemctl --user enable pipewire pipewire-pulse wireplumber
+systemctl --user start pipewire pipewire-pulse wireplumber
 
 echo -e "\033[32m<<==============================>>\033[0m"
 

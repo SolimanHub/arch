@@ -2,6 +2,11 @@
 set -e -u
 
 # Configuraciones tomadas de repos git
+# Comando ves carga y configuración
+cd /opt/
+sudo git clone https://github.com/SolimanHub/comando_ves
+sudo ln -s /opt/comando_ves/ves /usr/bin/ves
+cd /
 
 # Configurar i3wm
 cd /opt
