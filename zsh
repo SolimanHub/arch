@@ -1,9 +1,9 @@
 #!/bin/bash 
 
-user_home="/home/${SUDO_USER:-$USER}"
+user_home="/home/$(ls --ignore lost*)"
 
 # Configuración básica de zsh
-cd /home/"${SUDO_USER:-$USER}"/
+cd "$user_home"
 pacman -S --noconfirm --overwrite '*'zsh zsh-completions
 chsh -s "$(command -v zsh)" "${SUDO_USER:-$USER}"
 # Ejecutar comandos como usuario normal

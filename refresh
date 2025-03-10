@@ -4,7 +4,6 @@
 #
 set -euo pipefail
 
-sed -i -E 's/^selected_kernels="[^"]+"/selected_kernels="selected_kernelsxyz"/' paquetes
 sed -i -E 's/^hostname="[^"]+"/hostname="temporalxyz"/' conf
 sed -i -E 's/[[:space:]]root_pass="[^"]+"/[[:space:]]root_pass="tu_password_root"/' usuarios
 sed -i -E 's/[[:space:]]user_pass="[^"]+"/[[:space:]]user_pass="tu_password_usuario"/' usuarios

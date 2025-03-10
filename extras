@@ -125,8 +125,6 @@ if [[ "$MINIMAL_INSTALL" != "s" ]]; then
     done
 fi
 
-mv otros /home/${SUDO_USER:-$USER}
-
 echo -e "\033[32m==== REFRESH ====\033[0m"
 ./refresh
 
