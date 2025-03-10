@@ -2,7 +2,7 @@
 set -e -u
 
 # Limpieza de archivos importados
-rm conf grub extras usuarios zsh
+rm conf grub extras usuarios zsh limpiar
 
 echo -e "\033[32m¡Instalación completada con éxito!\033[0m"
 echo -e "\033[32mPara agregar AUR ejecutar ./yay_install\033[0m"
