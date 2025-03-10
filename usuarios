@@ -16,7 +16,5 @@ useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner 
 echo "===== Crear contraseña para $usuario ====="
 echo "$usuario:$user_pass" | chpasswd
 
-unset root_pass user_pass  # Limpia las variables de contraseña
-
 ./grub
 
