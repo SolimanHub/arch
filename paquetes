@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
+# Configurar colores
+RED='\033[31m'
+GREEN='\033[32m'
+YELLOW='\033[33m'
+NC='\033[0m'
 
 # --- Instalación base ---
 selected_kernels="selected_kernelsxyz"
@@ -18,4 +22,6 @@ genfstab -U /mnt >> /mnt/etc/fstab
 # --- Continuar configuración ---
 echo "Ejecutando pre-conf..."
 echo "<<==============================>>"
+
+echo -e "\033[32m==== PRE-CONF ====\033[0m"
 ./pre-conf

@@ -18,4 +18,5 @@ git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "\${ZSH_CUSTO
 sed -i 's/^plugins=.*/plugins=(git zsh-autosuggestions zsh-syntax-highlighting)/' "$user_home/.zshrc"
 EOF
 
+echo -e "\033[32m==== YAY_INSTALL ====\033[0m"
 ./yay_install

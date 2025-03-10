@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
+# Configurar colores
+RED='\033[31m'
+GREEN='\033[32m'
+YELLOW='\033[33m'
+NC='\033[0m'
 
 echo -e "\nDiscos disponibles para trabajar:"
 echo -e "\033[32mSelecciona uno (ej: sda):\033[0m"
@@ -100,4 +105,6 @@ swapon "${DISCO}2"
 
 echo -e "\nProceso finalizado."
 echo -e "\033[32mSigue ./paquetes\033[0m"
+
+echo -e "\033[32m==== PAQUETES ====\033[0m"
 ./paquetes

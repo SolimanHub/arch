@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
+# Configurar colores
+RED='\033[31m'
+GREEN='\033[32m'
+YELLOW='\033[33m'
+NC='\033[0m'
 
 hostname="temporalxyz"
 
@@ -31,4 +36,5 @@ hwclock -w
 echo "$hostname" > /etc/hostname
 
 # Ejecutar configuración de usuarios
+echo -e "\033[32m==== USUARIOS ====\033[0m"
  ./usuarios

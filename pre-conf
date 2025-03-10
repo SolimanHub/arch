@@ -1,5 +1,10 @@
 #!/usr/bin/bash
 set -e -u
+# Configurar colores
+RED='\033[31m'
+GREEN='\033[32m'
+YELLOW='\033[33m'
+NC='\033[0m'
 
 cp ./configs/* /mnt
 cp conf /mnt
@@ -12,5 +17,7 @@ cp refresh /mnt
 cp yay_install /mnt
 cp -r Luv /mnt
 cp -r fonts/ /mnt
+
+echo -e "\033[32m==== CONF ====\033[0m"
 
 arch-chroot /mnt /conf

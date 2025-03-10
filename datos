@@ -6,12 +6,16 @@ RED='\033[31m'
 GREEN='\033[32m'
 YELLOW='\033[33m'
 NC='\033[0m'
+MINIMAL_INSTALL="n"  
 
 # Función para salir ante errores
 error_exit() {
     echo -e "\033[31m[ERROR] $1\033[0m" >&2
     exit 1
 }
+
+read -rp "¿Desea instalación mínima? [s/N]: " MINIMAL_INSTALL
+MINIMAL_INSTALL=${MINIMAL_INSTALL,,}
 
 # Solicitar información
 echo -e "${GREEN}== Configuración de instalación de Arch Linux ==${NC}"
@@ -47,41 +51,45 @@ echo -e "Hostname: ${YELLOW}$hostname${NC}"
 echo -e "Usuario root: ${YELLOW}Password establecido${NC}"
 echo -e "Usuario normal: ${YELLOW}$username${NC}"
 echo -e "Password usuario: ${YELLOW}Password establecido${NC}${GREEN}\n== Continua con la instalación ==${NC}"
+
 # --- Selección de entorno gráfico ---
-echo -e "\033[32m===== Selección de entornos gráficos =====\033[0m"
-echo -e "\033[32m1) i3wm (Default)\033[32m"
-echo -e "2) XFCE4\033[0m"
-echo -e "3) GNOME\033[0m"
-echo -e "4) KDE Plasma\033[0m"
-echo -e "5) Hyprland (Wayland moderno)\033[0m"
-echo -e "6) GNOME Minimal\033[0m"
-echo -e "7) Sway (i3 en Wayland)\033[0m"
-echo -e "8) MATE (Clásico ligero)\033[0m"
+if [[ "$MINIMAL_INSTALL" != "s" ]]; then
+  echo -e "\033[32m===== Selección de entornos gráficos =====\033[0m"
+  echo -e "\033[32m1) i3wm (Default)\033[32m"
+  echo -e "2) XFCE4\033[0m"
+  echo -e "3) GNOME\033[0m"
+  echo -e "4) KDE Plasma\033[0m"
+  echo -e "5) Hyprland (Wayland moderno)\033[0m"
+  echo -e "6) GNOME Minimal\033[0m"
+  echo -e "7) Sway (i3 en Wayland)\033[0m"
+  echo -e "8) MATE (Clásico ligero)\033[0m"
 
-select_desktop() {
-    read -rp "Opciones (separar por comas) [1]: " desktop_choices
-    desktop_choices=${desktop_choices:-1}  # Valor por defecto
-    
-    local cleaned_choices=()
-    IFS=',' read -ra raw_choices <<< "$desktop_choices"
-    
-    for choice in "${raw_choices[@]}"; do
-        case "$(echo "$choice" | tr -d '[:space:]')" in
-            1|2|3|4|5|6|7|8)
-                cleaned_choices+=("$choice")
-                ;;
-            *)
-                echo -e "${RED}Opción '$choice' inválida. Usando default (1).${NC}"
-                cleaned_choices=(1)
-                break
-                ;;
-        esac
-    done
-    
-    echo "${cleaned_choices[*]}" | tr ' ' ','
-}
-
-desktop_choices=$(select_desktop)
+  select_desktop() {
+      read -rp "Opciones (separar por comas) [1]: " desktop_choices
+      desktop_choices=${desktop_choices:-1}  # Valor por defecto
+      
+      local cleaned_choices=()
+      IFS=',' read -ra raw_choices <<< "$desktop_choices"
+      
+      for choice in "${raw_choices[@]}"; do
+	  case "$(echo "$choice" | tr -d '[:space:]')" in
+	      1|2|3|4|5|6|7|8)
+		  cleaned_choices+=("$choice")
+		  ;;
+	      *)
+		  echo -e "${RED}Opción '$choice' inválida. Usando default (1).${NC}"
+		  cleaned_choices=(1)
+		  break
+		  ;;
+	  esac
+      done
+      
+      echo "${cleaned_choices[*]}" | tr ' ' ','
+  }
+  desktop_choices=$(select_desktop)
+  sed -i "s/escritorioxyz/$desktop_choices/g" extras
+  sed -i "s/instalacion_minimaxyz/$MINIMAL_INSTALL/g" extras
+fi
 
 # --- Selección de kernel ---
 echo "Seleccionando kernel..."
@@ -110,6 +118,7 @@ sed -i "s/temporalxyz/$hostname/g" conf
 sed -i "s/usuarioxyz/$username/g" usuarios
 sed -i "s/tu_password_root/$root_pass_escaped/g" usuarios
 sed -i "s/tu_password_usuario/$user_pass_escaped/g" usuarios
-sed -i "s/escritorioxyz/$desktop_choices/g" extras
 sed -i "s/selected_kernelsxyz/$kernel_packages/g" paquetes
+
+echo -e "\033[32m==== DISK ====\033[0m"
 ./discos_gdisk

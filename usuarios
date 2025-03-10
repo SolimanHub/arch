@@ -1,5 +1,10 @@
 #!/usr/bin/bash
 set -e -u
+# Configurar colores
+RED='\033[31m'
+GREEN='\033[32m'
+YELLOW='\033[33m'
+NC='\033[0m'
 
 readonly root_pass="tu_password_root"
 readonly user_pass="tu_password_usuario"
@@ -16,5 +21,6 @@ useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner 
 echo "===== Crear contraseña para $usuario ====="
 echo "$usuario:$user_pass" | chpasswd
 
+echo -e "\033[32m==== GRUB ====\033[0m"
 ./grub
 
