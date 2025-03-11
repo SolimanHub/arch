@@ -70,7 +70,7 @@ if [[ "$MINIMAL_INSTALL" != "s" ]]; then
         networkmanager network-manager-applet \
         pipewire pipewire-pulse pipewire-alsa pipewire-jack wireplumber \
         pavucontrol \
-        kitty alacritty thunar firefox neovim
+        kitty xclip thunar firefox neovim
     
     # Herramientas de desarrollo
     pacman -S --noconfirm --overwrite '*' \
