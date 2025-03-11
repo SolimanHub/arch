@@ -10,7 +10,6 @@ readonly root_pass="tu_password_root"
 readonly user_pass="tu_password_usuario"
 readonly usuario="usuarioxyz"
 
-echo "===== Configurar contraseña de root ====="
 echo "root:$root_pass" | chpasswd
 
 echo "===== Crear usuario ====="
