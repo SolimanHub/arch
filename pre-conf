@@ -15,7 +15,6 @@ cp usuarios /mnt
 cp zsh /mnt
 cp refresh /mnt
 cp yay_install /mnt
-cp -r Luv /mnt
 cp -r fonts/ /mnt
 
 echo -e "\033[32m==== CONF ====\033[0m"
