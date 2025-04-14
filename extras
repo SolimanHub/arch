@@ -70,7 +70,11 @@ if [[ "$MINIMAL_INSTALL" != "s" ]]; then
         networkmanager network-manager-applet \
         pipewire pipewire-pulse pipewire-alsa pipewire-jack wireplumber \
         pavucontrol \
-        kitty tree xclip thunar firefox neovim
+        kitty tree xclip firefox neovim
+
+    # Thunar con plugins
+    pacman -S --noconfirm --overwrite '*' \
+      thunar thunar-archive-plugin thunar-media-tags-plugin thunar-shares-plugin thunar-volman tumbler ffmpegthumbnailer gvfs gvfs-mtp thunar-vcs-plugin
     
     # Herramientas de desarrollo
     pacman -S --noconfirm --overwrite '*' \
