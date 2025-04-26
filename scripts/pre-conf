@@ -19,4 +19,4 @@ cp -r ./scripts/fonts/ /mnt
 
 echo -e "\033[32m==== CONF ====\033[0m"
 
-arch-chroot /mnt /scripts/conf
+arch-chroot /mnt /root/arch/scripts/conf
