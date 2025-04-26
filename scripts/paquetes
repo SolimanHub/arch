@@ -24,4 +24,4 @@ echo "Ejecutando pre-conf..."
 echo "<<==============================>>"
 
 echo -e "\033[32m==== PRE-CONF ====\033[0m"
-./pre-conf
+./scripts/pre-conf

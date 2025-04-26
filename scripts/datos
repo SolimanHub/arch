@@ -87,8 +87,8 @@ if [[ "$MINIMAL_INSTALL" != "s" ]]; then
       echo "${cleaned_choices[*]}" | tr ' ' ','
   }
   desktop_choices=$(select_desktop)
-  sed -i "s/escritorioxyz/$desktop_choices/g" extras
-  sed -i "s/instalacion_minimaxyz/$MINIMAL_INSTALL/g" extras
+  sed -i "s/escritorioxyz/$desktop_choices/g" ./scripts/extras
+  sed -i "s/instalacion_minimaxyz/$MINIMAL_INSTALL/g" ./scripts/extras
 fi
 
 # --- Selección de kernel ---
@@ -114,14 +114,14 @@ kernel_packages=$(select_kernel)
 # Agregando info a los otros scripts
 root_pass_escaped=$(sed 's/[\/&]/\\&/g' <<< "$root_pass")
 user_pass_escaped=$(sed 's/[\/&]/\\&/g' <<< "$user_pass")
-sed -i "s/temporalxyz/$hostname/g" conf
-sed -i "s/usuarioxyz/$username/g" usuarios
-sed -i "s/usuarioxyz/$username/g" extras
-sed -i "s/usuarioxyz/$username/g" zsh
-sed -i "s/usuarioxyz/$username/g" yay_install
-sed -i "s/tu_password_root/$root_pass_escaped/g" usuarios
-sed -i "s/tu_password_usuario/$user_pass_escaped/g" usuarios
-sed -i "s/selected_kernelsxyz/$kernel_packages/g" paquetes
+sed -i "s/temporalxyz/$hostname/g" ./scripts/conf
+sed -i "s/usuarioxyz/$username/g" ./scripts/usuarios
+sed -i "s/usuarioxyz/$username/g" ./scripts/extras
+sed -i "s/usuarioxyz/$username/g" ./scripts/zsh
+sed -i "s/usuarioxyz/$username/g" ./scripts/yay_install
+sed -i "s/tu_password_root/$root_pass_escaped/g" ./scripts/usuarios
+sed -i "s/tu_password_usuario/$user_pass_escaped/g" ./scripts/usuarios
+sed -i "s/selected_kernelsxyz/$kernel_packages/g" ./scripts/paquetes
 
 echo -e "\033[32m==== DISK ====\033[0m"
-./discos_gdisk
+./scripts/discos_gdisk

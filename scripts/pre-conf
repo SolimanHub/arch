@@ -6,17 +6,17 @@ GREEN='\033[32m'
 YELLOW='\033[33m'
 NC='\033[0m'
 
-cp ./configs/* /mnt
-cp conf /mnt
-cp limpiar /mnt
-cp grub /mnt
-cp extras /mnt
-cp usuarios /mnt
-cp zsh /mnt
-cp refresh /mnt
-cp yay_install /mnt
-cp -r fonts/ /mnt
+cp ./scripts/configs/* /mnt
+cp ./scripts/conf /mnt
+cp ./scripts/limpiar /mnt
+cp ./scripts/grub /mnt
+cp ./scripts/extras /mnt
+cp ./scripts/usuarios /mnt
+cp ./scripts/zsh /mnt
+cp ./scripts/refresh /mnt
+cp ./scripts/yay_install /mnt
+cp -r ./scripts/fonts/ /mnt
 
 echo -e "\033[32m==== CONF ====\033[0m"
 
-arch-chroot /mnt /conf
+arch-chroot /mnt /scripts/conf
