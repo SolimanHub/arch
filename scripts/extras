@@ -114,7 +114,10 @@ if [[ "$MINIMAL_INSTALL" != "s" ]]; then
     
     for choice in "${choices[@]}"; do
         case "$(tr -d '[:space:]' <<< "$choice")" in
-            1) pacman -S --noconfirm --overwrite '*' i3-gaps rofi picom feh dunst polybar ;;
+            1) pacman -S --noconfirm --overwrite '*' i3-gaps gnome-screenshot \
+              brightnessctl ttf-terminus-nerd \
+              ttf-roboto ttf-font-awesome rofi \
+              picom feh dunst polybar ;;
             2) pacman -S --noconfirm --overwrite '*' xfce4 xfce4-goodies ;;
             3) pacman -S --noconfirm --overwrite '*' gnome gnome-extra ;;
             4) pacman -S --noconfirm --overwrite '*' plasma kde-applications ;;
