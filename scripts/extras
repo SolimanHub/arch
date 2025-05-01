@@ -70,8 +70,9 @@ if [[ "$MINIMAL_INSTALL" != "s" ]]; then
         networkmanager network-manager-applet \
         pipewire pipewire-pulse pipewire-alsa pipewire-jack wireplumber \
         pavucontrol \
-        kitty tree xclip firefox neovim
-
+        kitty tree xclip firefox-developer-edition bluez blueberry bluez-utils neovim \
+        alsa-utils 
+    
     # Thunar con plugins
     pacman -S --noconfirm --overwrite '*' \
       thunar thunar-archive-plugin thunar-media-tags-plugin thunar-shares-plugin thunar-volman tumbler ffmpegthumbnailer gvfs gvfs-mtp thunar-vcs-plugin
@@ -97,6 +98,7 @@ cp yay_install "$USER_HOME" && chown -R "$USER_NAME:" "$USER_HOME/yay_install"
 # Configurar servicios
 systemctl daemon-reload 
 systemctl enable NetworkManager
+systemctl enable --now bluetooth
 
 [[ "$MINIMAL_INSTALL" != "s" ]] && systemctl enable lightdm
 
