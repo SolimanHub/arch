@@ -55,7 +55,7 @@ fi
 # ===== Paquetes base esenciales =====
 pacman -S --needed --noconfirm --overwrite '*' \
     xorg-server xorg-xinit xorg-xrandr \
-    sudo bash-completion jq curl wget git \
+    sudo bash-completion jq bat curl wget git \
     man-db man-pages texinfo pciutils \
     wpa_supplicant dialog xf86-input-synaptics htop \
     gvfs gvfs-afc gvfs-mtp 
