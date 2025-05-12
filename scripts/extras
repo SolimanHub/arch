@@ -98,7 +98,7 @@ cp yay_install "$USER_HOME" && chown -R "$USER_NAME:" "$USER_HOME/yay_install"
 # Configurar servicios
 systemctl daemon-reload 
 systemctl enable NetworkManager
-systemctl enable --now bluetooth
+systemctl enable bluetooth
 
 [[ "$MINIMAL_INSTALL" != "s" ]] && systemctl enable lightdm
 
