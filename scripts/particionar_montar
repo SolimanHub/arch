@@ -13,176 +13,216 @@ echo -e "${GREEN}Selecciona uno (ej: sda):${NC}"
 echo
 lsblk -d -o NAME,SIZE,TYPE | grep disk
 echo
-read -p "Disco (ej. sda): " unidad
+read -rp "Disco (ej. sda): " unidad
 DISCO="/dev/$unidad"
 
 if [ ! -b "$DISCO" ]; then
+    clear
     echo -e "${RED}Error: La unidad '$DISCO' no existe.${NC}"
+    #echo -e "${GREEN}Ejecuta `./scripts/particionar_montar` para continuar el parcionado.${NC}"
+    ./scripts/particionar_montar
     exit 1
 fi
 
-# Preguntar si desea encriptar
-read -p "¿Deseas encriptar el disco? [S/n] " encriptar
-encriptar=${encriptar:-S}
+# Detectar sufijo para las particiones (solo para dispositivos que terminan en número, ej. nvme0n1)
+if [[ "$DISCO" =~ nvme ]] || [[ "$DISCO" =~ mmcblk ]]; then
+    PART_SUFFIX="p"
+else
+    PART_SUFFIX=""
+fi
 
-if [[ "$encriptar" =~ [sS] ]]; then
-    # borrado seguro solo si se encripta
-    read -p "¿Deseas borrar el disco sobrescribiendo datos aleatorios? [S/n] " borrar_disco
-    borrar_disco=${borrar_disco:-S}
+confirmar() {
+    # Función para pedir confirmación [S/n]
+    local pregunta="$1"
+    local respuesta
+    read -rp "$pregunta [S/n]: " respuesta
+    respuesta=${respuesta:-S}
+    [[ "$respuesta" =~ ^[sS]$ ]]
+}
 
-    if [[ "$borrar_disco" =~ [sS] ]]; then
-        echo -e "${YELLOW}\n¡Advertencia! ¡Esto borrará TODOS los datos en $DISCO de forma irreversible!${NC}"
-        echo -e "${GREEN}Sobrescribiendo disco con datos aleatorios... (Esto puede tomar varias horas)${NC}"
-        echo -e "${YELLOW}Por favor espera...${NC}\n"
-        # Crear contenedor cifrado temporal
-        cryptsetup open --type plain --key-file /dev/urandom "$DISCO" to_be_wiped
-        echo -e "${YELLOW}Importante: Durante el proceso verás un mensaje de 'No queda espacio en el dispositivo'. ${NC}"
-        echo -e "${YELLOW}Este mensaje es completamente normal y esperado, ya que estamos llenando intencionalmente todo el espacio disponible. ${NC}"
-        echo -e "${YELLOW}No es un error sino la confirmación de que se ha sobrescrito exitosamente todo el dispositivo.${NC}\n"
-        echo -e "${YELLOW}Ten paciencia mientras se generan datos aleatorios y se completa el proceso...${NC}\n"
-        # Sobrescribir con ceros (aparecerán como aleatorios por el cifrado)
-        dd if=/dev/zero of=/dev/mapper/to_be_wiped status=progress bs=1M || true
-        cryptsetup close to_be_wiped || true
+echo
+if confirmar "¿Deseas encriptar el disco?"; then
+    encriptar=true
+else
+    encriptar=false
+fi
 
-        echo -e "\n${GREEN}¡Disco sobrescrito correctamente!${NC}\n"
+if $encriptar && confirmar "¿Deseas borrar el disco sobrescribiendo datos aleatorios? (Borrado irreversible)"; then
+    echo -e "${YELLOW}\n¡Advertencia! ¡Esto borrará TODOS los datos en $DISCO de forma irreversible!${NC}"
+    if confirmar "¿Confirmas que deseas continuar con el borrado seguro?"; then
+        echo -e "${GREEN}Sobrescribiendo disco con datos aleatorios... Esto puede tardar horas.${NC}"
+        dd if=/dev/urandom of="$DISCO" bs=1M status=progress conv=fdatasync
+        echo -e "${GREEN}¡Disco sobrescrito correctamente!${NC}\n"
+    else
+        echo -e "${RED}Borrado seguro cancelado por el usuario.${NC}"
+        exit 1
     fi
 fi
 
 # Parámetros de particionado
-EFI_SIZE=513         # MiB (512 + 1 para alineación)
-SWAP_SIZE=2048       # MiB (2GB)
+EFI_SIZE=513         # MiB estándar para EFI
+SWAP_SIZE=2048       # MiB (2GB swap)
 
 # Obtener tamaño total del disco en MiB
 tamanio_mib=$(($(blockdev --getsize64 "$DISCO") / 1024 / 1024))
 
 # Validar espacio mínimo total
-ESPACIO_MINIMO=$((EFI_SIZE + SWAP_SIZE + 3072))  # 3GB mínimo para root
+ESPACIO_MINIMO=$((EFI_SIZE + SWAP_SIZE + 20480))  # 20GB mínimo para root
 if (( tamanio_mib < ESPACIO_MINIMO )); then
-    echo -e "${RED}Error: Espacio insuficiente. Necesitas al menos $((ESPACIO_MINIMO/1024))GB.${NC}"
+    echo -e "${RED}Error: Espacio insuficiente. Necesitas al menos $((ESPACIO_MINIMO / 1024))GB.${NC}"
     exit 1
 fi
 
-# Crear particiones
 echo -e "${GREEN}\n=== Particionado con parted ===${NC}"
-parted "$DISCO" mklabel gpt
+parted -s "$DISCO" mklabel gpt
 
-if [[ "$encriptar" =~ [sS] ]]; then
-    # FLUJO CON ENCRIPTACIÓN
-    parted "$DISCO" mkpart ESP fat32 1MiB ${EFI_SIZE}MiB
-    parted "$DISCO" set 1 esp on
-    parted "$DISCO" mkpart primary ${EFI_SIZE}MiB 100%  # LVM
+if $encriptar; then
+    # Partición EFI (establecer inicio en 1MiB para alineación)
+    parted -s "$DISCO" mkpart ESP fat32 1MiB "$((EFI_SIZE + 1))MiB"
+    parted -s "$DISCO" set 1 esp on
 
-    # Formatear EFI
+    # Partición para LUKS ocupando el resto del disco
+    start_luks=$((EFI_SIZE + 1))
+    end_luks=100%
+    parted -s "$DISCO" mkpart primary "$start_luks"MiB "$end_luks"
+
+    # Esperar a que kernel recargue tabla de particiones
+    partprobe "$DISCO"
+    sleep 2
+
+    EFI_PART="${DISCO}${PART_SUFFIX}1"
+    LUKS_PART="${DISCO}${PART_SUFFIX}2"
+
+    if [ ! -b "$EFI_PART" ] || [ ! -b "$LUKS_PART" ]; then
+        echo -e "${RED}Error: No se detectaron las particiones creadas.${NC}"
+        exit 1
+    fi
+
     echo -e "${GREEN}\n=== Formateando partición EFI ===${NC}"
-    mkfs.fat -F32 "${DISCO}1"
+    mkfs.fat -F32 "$EFI_PART"
 
-    # Encriptar partición LVM
-    echo -e "${GREEN}\n=== Encriptando partición LVM ===${NC}"
+    echo -e "${GREEN}\n=== Encriptando partición LUKS ===${NC}"
     cryptsetup luksFormat --type luks2 \
-        --pbkdf argon2id \
-        --iter-time 4000 \
-        --key-size 512 \
-        --hash sha3-512 \
-        "${DISCO}2"
+        --pbkdf argon2id --iter-time 4000 --key-size 512 --hash sha3-512 \
+        "$LUKS_PART"
+
+    echo -e "${GREEN}\n=== Abriendo contenedor LUKS ===${NC}"
+    cryptsetup open "$LUKS_PART" cryptlvm
 
     echo -e "${GREEN}\n=== Configurando LVM ===${NC}"
-    cryptsetup open "${DISCO}2" cryptlvm
     pvcreate /dev/mapper/cryptlvm
     vgcreate vol01 /dev/mapper/cryptlvm
 
-    # Preguntar por partición /home
-    read -p "¿Deseas crear una partición /home? [S/n] " crear_home
-    crear_home=${crear_home:-S}
+    if ! vgdisplay vol01 > /dev/null 2>&1; then
+        echo -e "${RED}Error: Falló la creación del volume group vol01.${NC}"
+        cryptsetup close cryptlvm
+        exit 1
+    fi
 
-    if [[ "$crear_home" =~ [sS] ]]; then
-        total_vg_mib=$(vgs vol01 --units m -o vg_size --noheadings | sed 's/[[:alpha:]]//g' | awk '{print int($1)}')
-        home_max_mib=$((total_vg_mib - 22*1024))  # 22GB = 2GB (swap) + 20GB (root mín)
+    echo
+    if confirmar "¿Deseas crear una partición /home?"; then
+        crear_home=true
+    else
+        crear_home=false
+    fi
 
+    total_vg_mib=$(vgs vol01 --units m -o vg_size --noheadings | sed 's/[[:alpha:]]//g' | awk '{print int($1)}')
+    home_max_mib=$((total_vg_mib - 22*1024))  # 22GB para swap+root como mínimo
+
+    if $crear_home; then
         if (( home_max_mib <= 0 )); then
-            echo -e "${RED}Error: Espacio insuficiente. Necesitas al menos 22GB para swap y root.${NC}"
+            echo -e "${RED}Error: Espacio insuficiente para swap y root.${NC}"
+            cryptsetup close cryptlvm
             exit 1
         fi
-
         home_max_gb=$((home_max_mib / 1024))
         default_home_gb=$((home_max_gb / 2))
 
         echo -e "${GREEN}Espacio disponible para /home: ${home_max_gb}GB${NC}"
-        read -p "Tamaño para /home (GB, default: ${default_home_gb}): " home_gb
+        read -rp "Tamaño para /home (GB, por defecto ${default_home_gb}): " home_gb
         home_gb=${home_gb:-$default_home_gb}
 
         if ! [[ "$home_gb" =~ ^[0-9]+$ ]] || (( home_gb > home_max_gb )); then
-            echo -e "${RED}Error: Tamaño inválido o excede el espacio disponible${NC}"
+            echo -e "${RED}Error: Tamaño inválido o excede espacio disponible.${NC}"
+            cryptsetup close cryptlvm
             exit 1
         fi
 
         home_mib=$((home_gb * 1024))
-
-        # Crear volúmenes lógicos
         lvcreate -L "${SWAP_SIZE}M" -n swap vol01
         lvcreate -L "${home_mib}M" -n home vol01
         lvcreate -l 100%FREE -n root vol01
     else
-        # Crear solo swap y root
         lvcreate -L "${SWAP_SIZE}M" -n swap vol01
         lvcreate -l 100%FREE -n root vol01
     fi
 
-    # Formatear particiones
+    # Validar creación de LV
+    if ! lvdisplay vol01/root > /dev/null 2>&1; then
+        echo -e "${RED}Error: No se creó el volumen lógico root.${NC}"
+        cryptsetup close cryptlvm
+        exit 1
+    fi
+
     echo -e "${GREEN}\n=== Formateando volúmenes lógicos ===${NC}"
     mkfs.ext4 /dev/vol01/root
     mkswap /dev/vol01/swap
 
-    if [[ "$crear_home" =~ [sS] ]]; then
+    if $crear_home; then
+        if ! lvdisplay vol01/home > /dev/null 2>&1; then
+            echo -e "${RED}Error: No se creó el volumen lógico home.${NC}"
+            cryptsetup close cryptlvm
+            exit 1
+        fi
         mkfs.ext4 /dev/vol01/home
     fi
 
-    # Montar particiones
     echo -e "${GREEN}\n=== Montando particiones ===${NC}"
     mount /dev/vol01/root /mnt
-    mount --mkdir "${DISCO}1" /mnt/boot
+    mkdir -p /mnt/boot
+    mount "$EFI_PART" /mnt/boot
 
-    if [[ "$crear_home" =~ [sS] ]]; then
-        mount --mkdir /dev/vol01/home /mnt/home
+    if $crear_home; then
+        mkdir -p /mnt/home
+        mount /dev/vol01/home /mnt/home
     fi
 
     swapon /dev/vol01/swap
 
-    # Configurar UUID para systemd-boot
-    LUKS_UUID=$(blkid -s UUID -o value "${DISCO}2")
-    if [ -f "./scripts/systemd_boot" ]; then
-        sed -i "s/<TU-UUID-AQUI>/${LUKS_UUID}/g" ./scripts/systemd_boot
+    # Configurar UUID para systemd-boot si existe y UUID válido
+    LUKS_UUID=$(blkid -s UUID -o value "$LUKS_PART" || echo "")
+    if [[ -n "$LUKS_UUID" && -f ./scripts/systemd_boot ]]; then
+        #sed -i "s/<TU-UUID-AQUI>/${LUKS_UUID}/g" ./scripts/systemd_boot
+
     fi
 
 else
-    # FLUJO SIN ENCRIPTACIÓN (particionamiento tradicional)
     echo -e "${GREEN}\n=== Configuración sin encriptación ===${NC}"
-    
-    # Calcular espacio disponible después de EFI y swap
+
     espacio_disponible_mib=$((tamanio_mib - EFI_SIZE - SWAP_SIZE))
     espacio_disponible_gb=$((espacio_disponible_mib / 1024))
-    
-    # Validar espacio mínimo para root (20GB)
+
     if (( espacio_disponible_mib < 20480 )); then
-        echo -e "${RED}Error: Espacio insuficiente para root. Necesitas al menos 20GB.${NC}"
+        echo -e "${RED}Error: Espacio insuficiente para root (mínimo 20GB).${NC}"
         exit 1
     fi
-    
+
     echo -e "${GREEN}Espacio disponible para root y home: ${espacio_disponible_gb}GB${NC}"
-    
-    # Preguntar por partición /home
-    read -p "¿Deseas crear una partición /home? [S/n] " crear_home
-    crear_home=${crear_home:-S}
 
-    # Crear partición EFI (siempre primera)
-    parted "$DISCO" mkpart ESP fat32 1MiB ${EFI_SIZE}MiB
-    parted "$DISCO" set 1 esp on
+    if confirmar "¿Deseas crear una partición /home?"; then
+        crear_home=true
+    else
+        crear_home=false
+    fi
 
-    if [[ "$crear_home" =~ [sS] ]]; then
-        # Calcular tamaños para root (70%) y home (30%)
+    # Crear EFI
+    parted -s "$DISCO" mkpart ESP fat32 1MiB "$((EFI_SIZE + 1))MiB"
+    parted -s "$DISCO" set 1 esp on
+
+    if $crear_home; then
         root_size_mib=$((espacio_disponible_mib * 70 / 100))
         home_size_mib=$((espacio_disponible_mib - root_size_mib))
-        
-        # Asegurar mínimo 20GB para root
+
         if (( root_size_mib < 20480 )); then
             root_size_mib=20480
             home_size_mib=$((espacio_disponible_mib - root_size_mib))
@@ -191,48 +231,83 @@ else
                 exit 1
             fi
         fi
-        
-        # Crear particiones: swap, root, home
-        parted "$DISCO" mkpart primary linux-swap ${EFI_SIZE}MiB $((EFI_SIZE + SWAP_SIZE))MiB
-        parted "$DISCO" mkpart primary ext4 $((EFI_SIZE + SWAP_SIZE))MiB $((EFI_SIZE + SWAP_SIZE + root_size_mib))MiB
-        parted "$DISCO" mkpart primary ext4 $((EFI_SIZE + SWAP_SIZE + root_size_mib))MiB 100%
-        
-        # Formatear particiones
+
+        swap_start=$((EFI_SIZE + 1))
+        swap_end=$((swap_start + SWAP_SIZE))
+        root_start=$swap_end
+        root_end=$((root_start + root_size_mib))
+        home_start=$root_end
+        home_end=100%
+
+        parted -s "$DISCO" mkpart primary linux-swap "${swap_start}MiB" "${swap_end}MiB"
+        parted -s "$DISCO" mkpart primary ext4 "${root_start}MiB" "${root_end}MiB"
+        parted -s "$DISCO" mkpart primary ext4 "${home_start}MiB" "$home_end"
+
+        partprobe "$DISCO"
+        sleep 2
+
+        EFI_PART="${DISCO}${PART_SUFFIX}1"
+        SWAP_PART="${DISCO}${PART_SUFFIX}2"
+        ROOT_PART="${DISCO}${PART_SUFFIX}3"
+        HOME_PART="${DISCO}${PART_SUFFIX}4"
+
+        for p in "$EFI_PART" "$SWAP_PART" "$ROOT_PART" "$HOME_PART"; do
+            if [ ! -b "$p" ]; then
+                echo -e "${RED}Error: No se detectó la partición $p.${NC}"
+                exit 1
+            fi
+        done
+
         echo -e "${GREEN}\n=== Formateando particiones ===${NC}"
-        mkfs.fat -F32 "${DISCO}1"    # EFI
-        mkswap "${DISCO}2"           # Swap
-        mkfs.ext4 "${DISCO}3"        # Root
-        mkfs.ext4 "${DISCO}4"        # Home
-        
-        # Montar particiones
+        mkfs.fat -F32 "$EFI_PART"
+        mkswap "$SWAP_PART"
+        mkfs.ext4 "$ROOT_PART"
+        mkfs.ext4 "$HOME_PART"
+
         echo -e "${GREEN}\n=== Montando particiones ===${NC}"
-        mount "${DISCO}3" /mnt
+        mount "$ROOT_PART" /mnt
         mkdir -p /mnt/home
-        mount "${DISCO}4" /mnt/home
+        mount "$HOME_PART" /mnt/home
         mkdir -p /mnt/boot
-        mount "${DISCO}1" /mnt/boot
-        swapon "${DISCO}2"
-        
+        mount "$EFI_PART" /mnt/boot
+        swapon "$SWAP_PART"
+
     else
-        # Crear particiones: swap y root (todo el espacio restante)
-        parted "$DISCO" mkpart primary linux-swap ${EFI_SIZE}MiB $((EFI_SIZE + SWAP_SIZE))MiB
-        parted "$DISCO" mkpart primary ext4 $((EFI_SIZE + SWAP_SIZE))MiB 100%
-        
-        # Formatear particiones
+        swap_start=$((EFI_SIZE + 1))
+        swap_end=$((swap_start + SWAP_SIZE))
+        root_start=$swap_end
+        root_end=100%
+
+        parted -s "$DISCO" mkpart primary linux-swap "${swap_start}MiB" "${swap_end}MiB"
+        parted -s "$DISCO" mkpart primary ext4 "${root_start}MiB" "$root_end"
+
+        partprobe "$DISCO"
+        sleep 2
+
+        EFI_PART="${DISCO}${PART_SUFFIX}1"
+        SWAP_PART="${DISCO}${PART_SUFFIX}2"
+        ROOT_PART="${DISCO}${PART_SUFFIX}3"
+
+        for p in "$EFI_PART" "$SWAP_PART" "$ROOT_PART"; do
+            if [ ! -b "$p" ]; then
+                echo -e "${RED}Error: No se detectó la partición $p.${NC}"
+                exit 1
+            fi
+        done
+
         echo -e "${GREEN}\n=== Formateando particiones ===${NC}"
-        mkfs.fat -F32 "${DISCO}1"    # EFI
-        mkswap "${DISCO}2"           # Swap
-        mkfs.ext4 "${DISCO}3"        # Root
-        
-        # Montar particiones
+        mkfs.fat -F32 "$EFI_PART"
+        mkswap "$SWAP_PART"
+        mkfs.ext4 "$ROOT_PART"
+
         echo -e "${GREEN}\n=== Montando particiones ===${NC}"
-        mount "${DISCO}3" /mnt
+        mount "$ROOT_PART" /mnt
         mkdir -p /mnt/boot
-        mount "${DISCO}1" /mnt/boot
-        swapon "${DISCO}2"
+        mount "$EFI_PART" /mnt/boot
+        swapon "$SWAP_PART"
     fi
 fi
 
 echo -e "${GREEN}\nProceso finalizado.${NC}"
 echo -e "${GREEN}Ejecutando script de paquetes...${NC}"
-#./scripts/paquetes
+# ./scripts/paquetes
