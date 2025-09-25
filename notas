@@ -8,3 +8,19 @@ sacar comando ves de extras
 
 qemu-system-x86_64 -enable-kvm -m 6G -smp 4 -drive file=/home/rx/ollama_models/qemu/archlinux2_vm.qcow2,format=qcow2,if=virtio,bus=1 -netdev user,id=n1 -device virtio-net,netdev=n1 -device virtio-rng-pci -bios /usr/share/edk2/x64/OVMF.4m.fd -device intel-hda
 
+Paquetes para hyperland+wayland
+```
+sudo pacman -S base-devel git meson ninja wlroots wayland xdg-desktop-portal-hyprland
+
+sudo pacman -S hyprland kitty ttf-font-awesome ttf-jetbrains-mono-nerd wl-clipboard grim slurp waybar wofi hyprpaper
+
+sudo pacman -S hyprland
+
+# o compilar la ultima versio
+git clone https://github.com/hyprwm/Hyprland
+cd Hyprland
+meson build
+ninja -C build
+sudo ninja -C build install
+
+```
