@@ -124,4 +124,4 @@ sed -i "s/tu_password_usuario/$user_pass_escaped/g" ./scripts/usuarios
 sed -i "s/selected_kernelsxyz/$kernel_packages/g" ./scripts/paquetes
 
 echo -e "\033[32m==== DISK ====\033[0m"
-./scripts/discos_gdisk
+./scripts/particionar_montar
