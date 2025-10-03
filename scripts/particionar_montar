@@ -16,10 +16,12 @@ echo
 read -rp "Disco (ej. sda): " unidad
 DISCO="/dev/$unidad"
 
+# Actualizar script grub con la unidad seleccionada
+sed -i "s/instalargruben/$unidad/" ./scripts/grub
+
 if [ ! -b "$DISCO" ]; then
     clear
     echo -e "${RED}Error: La unidad '$DISCO' no existe.${NC}"
-    #echo -e "${GREEN}Ejecuta `./scripts/particionar_montar` para continuar el parcionado.${NC}"
     ./scripts/particionar_montar
     exit 1
 fi
@@ -189,11 +191,11 @@ if $encriptar; then
 
     swapon /dev/vol01/swap
 
-    # Configurar UUID para systemd-boot si existe y UUID válido
+    # Configurar mkinitcpio para LUKS
+    echo -e "${GREEN}\n=== Configurando mkinitcpio para LUKS ===${NC}"
     LUKS_UUID=$(blkid -s UUID -o value "$LUKS_PART" || echo "")
-    if [[ -n "$LUKS_UUID" && -f ./scripts/systemd_boot ]]; then
-        #sed -i "s/<TU-UUID-AQUI>/${LUKS_UUID}/g" ./scripts/systemd_boot
-
+    if [[ -n "$LUKS_UUID" ]]; then
+        echo "LUKS_UUID=$LUKS_UUID" > /mnt/luks_config
     fi
 
 else
@@ -308,6 +310,8 @@ else
     fi
 fi
 
-echo -e "${GREEN}\nProceso finalizado.${NC}"
-echo -e "${GREEN}Ejecutando script de paquetes...${NC}"
-# ./scripts/paquetes
+echo -e "${GREEN}\nProceso de particionado finalizado.${NC}"
+echo -e "${GREEN}Continuando con instalación de paquetes...${NC}"
+
+echo -e "\033[32m==== PAQUETES ====\033[0m"
+#./scripts/paquetes
