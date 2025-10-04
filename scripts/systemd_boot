@@ -38,10 +38,14 @@ fi
 #Instalar systemd-boot
 bootctl install
 
+#Restringiendo permisos
+chmod 700 /boot
+chmod 600 /boot/loader/random-seed
+
 echo -e "${GREEN}Crear archivo de configuración principal${NC}"
 
 echo "default arch.conf
-timeout 3
+timeout 1
 console-mode keep
 editor no" > /boot/loader/loader.conf
 

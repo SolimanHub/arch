@@ -3,6 +3,7 @@ set -euo pipefail
 trap 'echo -e "${RED}Error en línea $LINENO. Comando: $BASH_COMMAND${NC}"' ERR
 
 cd /
+pacman -Syy
 # ===== Configuraciones iniciales =====
 export LC_ALL=C
 DEFAULT_DESKTOP=1
@@ -116,13 +117,12 @@ if [[ "$MINIMAL_INSTALL" == "s" ]]; then
         man-db man-pages texinfo pciutils usbutils \
         wpa_supplicant dialog htop \
         gvfs gvfs-afc gvfs-mtp \
-        systemd-resolvconf systemd-networkd # Opciones de red mínimas
+        networkmanager bluez blueberry bluez-utils 
 
     # Detectar e instalar controladores gráficos
     detect_gpu_drivers
 
     # Configurar servicios esenciales (sin GUI)
-    systemctl daemon-reload
     systemctl enable NetworkManager
     systemctl enable bluetooth
 
