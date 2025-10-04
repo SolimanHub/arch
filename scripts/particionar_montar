@@ -56,11 +56,13 @@ if $encriptar && confirmar "¿Deseas borrar el disco sobrescribiendo datos aleat
         echo 
         echo -e "${YELLOW}Importante: Durante el proceso verás un mensaje de 'No queda espacio en el dispositivo'. ${NC}"
         echo -e "${YELLOW}Este mensaje es completamente normal y esperado, ya que estamos llenando intencionalmente todo el espacio disponible. ${NC}"
-        echo -e "${YELLOW}No es un error sino la confirmación de que se ha sobrescrito exitosamente todo el dispositivo.${NC}\n"
+        echo -e "${YELLOW}No es un error sino la confirmación de que se ha sobrescrito exitosamente todo el dispositivo.${NC}"
 
+        echo -e "${YELLOW}=========================================${NC}"
         echo -e "${YELLOW}Ten paciencia mientras se generan datos aleatorios y se completa el proceso...${NC}\n"
 
-        dd if=/dev/urandom of="$DISCO" bs=1M status=progress conv=fdatasync
+        dd if=/dev/urandom of="$DISCO" bs=1M status=progress conv=fdatasync || true
+
         echo -e "${GREEN}¡Disco sobrescrito correctamente!${NC}\n"
     else
         echo -e "${RED}Borrado seguro cancelado por el usuario.${NC}"
