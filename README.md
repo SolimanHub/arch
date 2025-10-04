@@ -34,6 +34,12 @@ cd arch
 ```bash
 ./start
 ```
+#### 📋 Flujo del proceso:
+```text
+start → datos → particionar_montar → paquetes → pre-conf → 
+arch-chroot → conf → usuarios → systemd_boot || grub → extras → 
+refresh → zsh → yay_install → limpiar
+```
 
 ---
 
