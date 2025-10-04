@@ -3,7 +3,6 @@ set -e -u
 cd /
 # Limpieza de archivos importados
 rm refresh conf systemd_boot extras usuarios zsh limpiar
-rm -rf fonts/
 rm lightdm.conf
 rm 50-synaptics.conf
 

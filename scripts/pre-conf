@@ -15,7 +15,6 @@ cp ./scripts/usuarios /mnt
 cp ./scripts/zsh /mnt
 cp ./scripts/refresh /mnt
 cp ./scripts/yay_install /mnt
-cp -r ./scripts/fonts/ /mnt
 
 echo -e "\033[32m==== CONF ====\033[0m"
 echo -e "arch-chroot /mnt /conf"

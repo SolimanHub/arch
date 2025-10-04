@@ -1,5 +1,7 @@
 #!/bin/bash
 set -euo pipefail
+trap 'echo -e "${RED}Error en línea $LINENO. Comando: $BASH_COMMAND${NC}"' ERR
+
 cd /
 # ===== Configuraciones iniciales =====
 export LC_ALL=C
@@ -7,19 +9,77 @@ DEFAULT_DESKTOP=1
 MINIMAL_INSTALL="instalacion_minimaxyz"  
 USER_HOME="/home/usuarioxyz"
 USER_NAME="usuarioxyz"
+
+# ===== Función para detectar entornos Wayland =====
+# Retorna "true" si *todas* las selecciones son Wayland, "false" en cualquier otro caso.
+is_only_wayland() {
+    local choices="$1"
+    local has_wayland="false"
+    local has_x11="false"
+    local choice
+
+    # Si no hay selección (instalación mínima), no es Wayland exclusivo.
+    if [[ -z "$choices" ]]; then
+        echo "false"
+        return
+    fi
+
+    IFS=',' read -ra selected_array <<< "$choices"
+
+    for choice in "${selected_array[@]}"; do
+        case "$(tr -d '[:space:]' <<< "$choice")" in
+            5) # Hyprland -> Wayland
+                has_wayland="true"
+                ;;
+            7) # Sway -> Wayland (principalmente)
+                has_wayland="true"
+                # Opcional: Si se considera que Sway puede coexistir o no, se podría
+                # manejar de otra forma. Para este caso, lo incluimos como "Wayland"
+                # si es la *única* opción o *una* de las opciones Wayland.
+                ;;
+            1|2|3|4|6|8) # i3wm, XFCE4, GNOME, KDE Plasma, GNOME Minimal, MATE -> X11
+                has_x11="true"
+                ;;
+            *)
+                # Opción inválida, asumimos X11 por seguridad.
+                has_x11="true"
+                ;;
+        esac
+    done
+
+    # Si hay X11, no es "solo Wayland"
+    if [[ "$has_x11" == "true" ]]; then
+        echo "false"
+        return
+    fi
+
+    # Si no hay X11 y hay Wayland, es "solo Wayland"
+    if [[ "$has_wayland" == "true" ]]; then
+        echo "true"
+        return
+    fi
+
+    # Si no hay ni X11 ni Wayland (caso raro o vacío ya manejado), no es solo Wayland
+    echo "false"
+}
+
 # ===== Detección automática de drivers gráficos =====
 detect_gpu_drivers() {
     echo -e "\033[32mDetectando controladores gráficos...\033[0m"
     local gpu_info=$(lspci | grep -i vga)
-    
     if grep -qi "intel" <<< "$gpu_info"; then
+        # Controladores específicos para Intel (X11 y Wayland)
         pacman -S --noconfirm --overwrite '*' xf86-video-intel vulkan-intel intel-media-driver
     elif grep -qi "amd" <<< "$gpu_info"; then
+        # Controladores específicos para AMD (X11 y Wayland)
         pacman -S --noconfirm --overwrite '*' xf86-video-amdgpu vulkan-radeon libva-mesa-driver
     elif grep -qi "nvidia" <<< "$gpu_info"; then
+        # Controladores específicos para NVIDIA (X11 principalmente, también Wayland con nvidia-open)
         pacman -S --noconfirm --overwrite '*' nvidia nvidia-utils nvidia-settings cuda
     else
-        echo -e "\033[32mUsando controladores genéricos (modesetting)\033[0m"
+        echo -e "\033[32mUsando controladores genéricos (modesetting) para X11 y Wayland\033[0m"
+        # Para X11
+        # Para Wayland, usualmente no necesita un paquete específico aparte del kernel driver
     fi
 }
 
@@ -27,7 +87,6 @@ detect_gpu_drivers() {
 detect_microcode() {
     local vendor
     vendor=$(grep -m1 -oP 'vendor_id\s*:\s*\K.*' /proc/cpuinfo | tr -d ' ')
-    
     if [[ "$vendor" == *"GenuineIntel"* ]]; then
         echo -e "\033[32mIntel detectado. Instalando intel-ucode\033[0m"
         microcode="intel-ucode"
@@ -49,87 +108,280 @@ if [[ -n "$microcode" ]]; then
 fi
 
 # ===== Instalación mínima =====
-#echo -e "\033[32m<<==============================>>\033[0m"
-#read -rp "¿Desea instalación mínima? [s/N]: " MINIMAL_INSTALL
-#MINIMAL_INSTALL=${MINIMAL_INSTALL,,}
-# ===== Paquetes base esenciales =====
-pacman -S --needed --noconfirm --overwrite '*' \
-    xorg-server xorg-xinit xorg-xrandr \
-    sudo bash-completion jq bat curl wget git \
-    man-db man-pages texinfo pciutils \
-    wpa_supplicant dialog xf86-input-synaptics htop \
-    gvfs gvfs-afc gvfs-mtp 
-# ===== Instalar controladores y kernel =====
+if [[ "$MINIMAL_INSTALL" == "s" ]]; then
+    echo -e "\033[32m===== Instalación Mínima =====\033[0m"
+    # Paquetes base esenciales para un sistema funcional sin GUI
+    pacman -S --needed --noconfirm --overwrite '*' \
+        sudo bash-completion jq bat curl wget git \
+        man-db man-pages texinfo pciutils usbutils \
+        wpa_supplicant dialog htop \
+        gvfs gvfs-afc gvfs-mtp \
+        systemd-resolvconf systemd-networkd # Opciones de red mínimas
+
+    # Detectar e instalar controladores gráficos
+    detect_gpu_drivers
+
+    # Configurar servicios esenciales (sin GUI)
+    systemctl daemon-reload
+    systemctl enable NetworkManager
+    systemctl enable bluetooth
+
+    # Instalar yay
+    cp yay_install "$USER_HOME" && chown -R "$USER_NAME:" "$USER_HOME/yay_install"
+
+    echo -e "\033[32m<<==============================>>\033[0m"
+    echo -e "\033[32m==== REFRESH ====\033[0m"
+    ./refresh
+    exit 0
+fi
+
+# ===== Instalación Completa =====
+echo -e "\033[32m===== Instalación Completa =====\033[0m"
+
+desktop_choices="escritorioxyz"
+
+# Detectar si solo se eligieron entornos Wayland
+if [[ $(is_only_wayland "$desktop_choices") == "true" ]]; then
+    echo -e "\033[33mSolo entornos Wayland detectados. Omitiendo paquetes de X11.\033[0m"
+    # Paquetes base esenciales *sin* X11
+    pacman -S --needed --noconfirm --overwrite '*' \
+        sudo bash-completion jq bat curl wget git \
+        man-db man-pages texinfo pciutils usbutils \
+        wpa_supplicant dialog htop \
+        gvfs gvfs-afc gvfs-mtp \
+        pipewire pipewire-alsa pipewire-pulse wireplumber \
+        networkmanager network-manager-applet \
+        firefox-developer-edition bluez blueberry bluez-utils neovim \
+        alsa-utils
+else
+    echo -e "\033[33mEntornos X11 detectados o mezcla. Instalando paquetes de X11.\033[0m"
+    # Paquetes base esenciales *con* X11
+    pacman -S --needed --noconfirm --overwrite '*' \
+        xorg-server xorg-xinit xorg-xrandr \
+        sudo bash-completion jq bat curl wget git \
+        man-db man-pages texinfo pciutils usbutils \
+        wpa_supplicant dialog xf86-input-synaptics htop \
+        gvfs gvfs-afc gvfs-mtp \
+        pipewire pipewire-alsa pipewire-pulse wireplumber \
+        networkmanager network-manager-applet \
+        firefox-developer-edition bluez blueberry bluez-utils neovim \
+        alsa-utils xclip
+fi
+
+# Detectar e instalar controladores gráficos
 detect_gpu_drivers
 
-# ===== Paquetes opcionales (solo instalación completa) =====
-if [[ "$MINIMAL_INSTALL" != "s" ]]; then
+# Paquetes comunes para instalación completa (independientes de X11/Wayland)
+# Fuentes
+pacman -S --noconfirm --overwrite '*' \
+    noto-fonts noto-fonts-emoji ttf-firacode-nerd
+
+# Audio
+pacman -S --noconfirm --overwrite '*' \
+    pavucontrol
+
+# Terminal y utilidades
+pacman -S --noconfirm --overwrite '*' \
+    alacritty tree
+
+# Thunar con plugins (requiere X11 para mostrar la interfaz gráfica)
+if [[ $(is_only_wayland "$desktop_choices") != "true" ]]; then
     pacman -S --noconfirm --overwrite '*' \
-        lightdm lightdm-gtk-greeter \
-        noto-fonts noto-fonts-emoji ttf-firacode-nerd \
-        networkmanager network-manager-applet \
-        pipewire pipewire-pulse pipewire-alsa pipewire-jack wireplumber \
-        pavucontrol \
-        kitty tree xclip firefox-developer-edition bluez blueberry bluez-utils neovim \
-        alsa-utils 
-    
-    # Thunar con plugins
+        thunar thunar-archive-plugin thunar-media-tags-plugin thunar-shares-plugin thunar-volman tumbler ffmpegthumbnailer gvfs gvfs-mtp thunar-vcs-plugin
+else
     pacman -S --noconfirm --overwrite '*' \
-      thunar thunar-archive-plugin thunar-media-tags-plugin thunar-shares-plugin thunar-volman tumbler ffmpegthumbnailer gvfs gvfs-mtp thunar-vcs-plugin
-    
-    # Herramientas de desarrollo
-    pacman -S --noconfirm --overwrite '*' \
-        docker docker-compose nodejs npm go rust \
-        python python-pip base-devel
-    
+      nautilus
+    echo -e "\033[33mGestor de archivos Thunar (X11) omitido para instalación Wayland exclusiva.\033[0m"
 fi
-# Configuración de lightdm
-rm /etc/lightdm/lightdm.conf
-cp lightdm.conf /etc/lightdm/
-echo "background=/usr/share/backgrounds/wall1.png" >> /etc/lightdm/lightdm-gtk-greeter.conf
-# Configuración para el touchpad
-cp 50-synaptics.conf /etc/X11/xorg.conf.d/
-# Instalación de fuentes
-cp fonts/* /usr/share/fonts/
-#rm -r fonts/
-# Cargar paquete de iconos
+
+# Herramientas de desarrollo
+pacman -S --noconfirm --overwrite '*' \
+    docker docker-compose nodejs npm go rust \
+    python python-pip base-devel
+
+# Configuración de login manager (LightDM para X11 o greetd para Wayland)
+if [[ $(is_only_wayland "$desktop_choices") != "true" ]]; then
+    # ===== Instalación y configuración para X11 =====
+    echo -e "\033[33mInstalando LightDM (X11)...\033[0m"
+    pacman -S --noconfirm --overwrite '*' \
+        lightdm lightdm-gtk-greeter
+
+    # Configurar LightDM
+    rm -f /etc/lightdm/lightdm.conf
+    cp lightdm.conf /etc/lightdm/
+    echo "background=/usr/share/backgrounds/wall1.png" >> /etc/lightdm/lightdm-gtk-greeter.conf
+
+    # Configuración para el touchpad (X11)
+    cp 50-synaptics.conf /etc/X11/xorg.conf.d/
+
+    # Habilitar LightDM
+    systemctl enable lightdm
+    echo -e "\033[32mLightDM (X11) configurado y habilitado.\033[0m"
+
+else
+    # ===== Instalación y configuración para Wayland (greetd) =====
+    echo -e "\033[33mInstalando greetd (Wayland)...\033[0m"
+    pacman -S --noconfirm --overwrite '*' greetd gtklock
+
+    # Configurar greetd
+    # Crear directorio de configuración si no existe
+    mkdir -p /etc/greetd/
+    # Crear archivo de configuración base (puedes personalizarlo más adelante si es necesario)
+    cat > /etc/greetd/config << 'EOF'
+[terminal]
+# The VT to run the greeter on. Can be "next", "current" or a number
+# designating the VT.
+vt = 1
+
+[default_session]
+# `command` is the command that will be run for the default session.
+# It can be anything, from a shell to a session (like "sway").
+command = "env WAYLAND_DISPLAY=wayland-1 sway --config /etc/greetd/sway_config"
+
+# `user` is the user the command will be run as.
+# It has to be an existing user, and it's better for it not to be a "real" user.
+user = "greetd"
+EOF
+
+    # Crear usuario 'greetd' si no existe (requerido por greetd)
+    if ! id "greetd" &>/dev/null; then
+        useradd -r -s /bin/nologin -U -d /var/lib/greetd -c "Greetd Greeter User" greetd
+        mkdir -p /var/lib/greetd
+        chown -R greetd:greetd /var/lib/greetd
+    fi
+
+    # Crear directorio para la configuración personalizada de Sway para greetd
+    mkdir -p /etc/greetd/
+
+    # Crear un archivo de configuración de Sway básico para greetd
+    # Este archivo inicia sway con sesiones de usuario predeterminadas para audio y otros servicios
+    # y opcionalmente inicia un agente de autenticidad como ssh-agent.
+    # Este ejemplo asume que el usuario se llamará 'usuarioxyz' y que se usará bash como shell.
+    # Deberás personalizarlo o copiar uno existente si tienes configuraciones específicas.
+    # Por ahora, creamos uno muy simple que inicia sway directamente.
+    # Para una integración más robusta, se puede copiar la config del usuario o generarla dinámicamente.
+    # Por simplicidad en este ejemplo, creamos una config mínima.
+    # IMPORTANTE: Esta config se sobrescribirá cada vez que se ejecute el script.
+    # Para personalizarla, deberías copiarla desde un archivo preexistente o usar un generador.
+    cat > /etc/greetd/sway_config << 'EOF'
+# Sway config for greetd
+output * bg /usr/share/backgrounds/wall1.png fill # Ajusta la ruta a tu fondo
+# Otros ajustes de Sway aquí si es necesario
+exec_always "systemctl --user import-environment DISPLAY WAYLAND_DISPLAY"
+exec_always "systemctl --user start pipewire pipewire-pulse wireplumber"
+# Opcional: Iniciar un agente SSH si es necesario
+# exec_always "eval $(ssh-agent -s)"
+# Opcional: Iniciar compositor Wayland si no es sway mismo (no es necesario aquí)
+# Iniciar sway
+default_orientation tabbed
+workspace_layout tabbed
+# Puedes añadir más configuraciones aquí
+EOF
+
+    # Opcional: Configurar gtklock como lockscreen si se desea
+    # gtklock ya está instalado arriba
+    # Se puede configurar en /etc/gtklock.ini o dejar la configuración por defecto
+
+    # Habilitar greetd
+    systemctl enable greetd
+    echo -e "\033[32mgreetd (Wayland) configurado y habilitado.\033[0m"
+fi
+
+# Cargar paquete de instalación de yay
 cp yay_install "$USER_HOME" && chown -R "$USER_NAME:" "$USER_HOME/yay_install"
 
-# Configurar servicios
-systemctl daemon-reload 
+# Configurar servicios comunes
+systemctl daemon-reload
 systemctl enable NetworkManager
 systemctl enable bluetooth
 
-[[ "$MINIMAL_INSTALL" != "s" ]] && systemctl enable lightdm
-
-# Configurar PipeWire
+# Configurar PipeWire (funciona en X11 y Wayland)
 systemctl --user enable pipewire pipewire-pulse wireplumber
 systemctl --user start pipewire pipewire-pulse wireplumber
 
 echo -e "\033[32m<<==============================>>\033[0m"
 
-if [[ "$MINIMAL_INSTALL" != "s" ]]; then
-    desktop_choices="escritorioxyz"
-    IFS=',' read -ra choices <<< "${desktop_choices:-$DEFAULT_DESKTOP}"
-    
-    for choice in "${choices[@]}"; do
-        case "$(tr -d '[:space:]' <<< "$choice")" in
-            1) pacman -S --noconfirm --overwrite '*' i3-gaps gnome-screenshot \
-              brightnessctl ttf-terminus-nerd \
-              ttf-roboto ttf-font-awesome rofi \
-              picom feh dunst polybar ;;
-            2) pacman -S --noconfirm --overwrite '*' xfce4 xfce4-goodies ;;
-            3) pacman -S --noconfirm --overwrite '*' gnome gnome-extra ;;
-            4) pacman -S --noconfirm --overwrite '*' plasma kde-applications ;;
-            5) pacman -S --noconfirm --overwrite '*' hyprland waybar grim slurp wofi ;;
-            6) pacman -S --noconfirm --overwrite '*' gnome-shell gnome-control-center gdm ;;
-            7) pacman -S --noconfirm --overwrite '*' sway swaylock swayidle wofi ;;
-            8) pacman -S --noconfirm --overwrite '*' mate mate-extra mate-media ;;
-            *) echo "Opción $choice omitida" ;;
-        esac
-    done
-fi
+# Instalación de entornos gráficos según selección
+IFS=',' read -ra choices <<< "${desktop_choices:-$DEFAULT_DESKTOP}"
+for choice in "${choices[@]}"; do
+    case "$(tr -d '[:space:]' <<< "$choice")" in
+        1) # i3wm (X11)
+            if [[ $(is_only_wayland "$desktop_choices") != "true" ]]; then
+                pacman -S --noconfirm --overwrite '*' i3-gaps gnome-screenshot \
+                    brightnessctl ttf-terminus-nerd \
+                    ttf-roboto ttf-font-awesome rofi \
+                    picom feh dunst polybar
+            else
+                echo -e "\033[33mOpción i3wm (X11) omitida para instalación Wayland exclusiva.\033[0m"
+            fi
+            ;;
+        2) # XFCE4 (X11)
+            if [[ $(is_only_wayland "$desktop_choices") != "true" ]]; then
+                pacman -S --noconfirm --overwrite '*' xfce4 xfce4-goodies
+            else
+                echo -e "\033[33mOpción XFCE4 (X11) omitida para instalación Wayland exclusiva.\033[0m"
+            fi
+            ;;
+        3) # GNOME (X11 por defecto, pero puede usar Wayland)
+            if [[ $(is_only_wayland "$desktop_choices") != "true" ]]; then
+                pacman -S --noconfirm --overwrite '*' gnome gnome-extra
+            else
+                echo -e "\033[33mOpción GNOME (X11) omitida para instalación Wayland exclusiva.\033[0m"
+            fi
+            ;;
+        4) # KDE Plasma (X11 por defecto, pero puede usar Wayland)
+            if [[ $(is_only_wayland "$desktop_choices") != "true" ]]; then
+                pacman -S --noconfirm --overwrite '*' plasma kde-applications
+            else
+                echo -e "\033[33mOpción KDE Plasma (X11) omitida para instalación Wayland exclusiva.\033[0m"
+            fi
+            ;;
+        5) # Hyprland (Wayland)
+            pacman -S --noconfirm --overwrite '*' brightnessctl hyprland waybar grim slurp wofi
+            # Opcional: servicios específicos de Hyprland (como hyprpaper, hypridle, etc.)
+            # systemctl --user enable hypridle hyprpaper # Ejemplo
+            ;;
+        6) # GNOME Minimal (X11)
+            if [[ $(is_only_wayland "$desktop_choices") != "true" ]]; then
+                pacman -S --noconfirm --overwrite '*' gnome-shell gnome-control-center gdm
+            else
+                echo -e "\033[33mOpción GNOME Minimal (X11) omitida para instalación Wayland exclusiva.\033[0m"
+            fi
+            ;;
+        7) # Sway (Wayland, puede usar XWayland)
+            # Instalamos Sway y herramientas comunes para Wayland
+            pacman -S --noconfirm --overwrite '*' sway swaylock swayidle wofi
+            # Opcional: Si se desea compatibilidad X11, instalar xorg-xwayland
+            # En este caso, como Sway puede usar XWayland, podríamos instalarlo
+            # incluso si la lógica principal dice "solo Wayland", dependiendo del uso previsto.
+            # Para mantener la lógica estricta, no lo instalamos si es "solo Wayland".
+            # Si se elige Sway junto con entornos X11, la lógica principal ya habilitó X11.
+            # Si *solo* se elige Sway, y es "solo Wayland", no instalamos XWayland.
+            # Si se elige Sway *y* Hyprland (ambos Wayland), sigue siendo "solo Wayland".
+            # Si se elige Sway *y* i3 (uno Wayland, uno X11), no es "solo Wayland", se instala X11 y XWayland.
+            # Para Sway solo, si se quiere XWayland, el usuario debería elegir también una opción X11 (aunque sea dummy) o instalarlo después.
+            # Simplificamos: Si es "solo Wayland", no se instala XWayland aquí.
+            if [[ $(is_only_wayland "$desktop_choices") != "true" ]]; then
+                 # Si no es solo Wayland, significa que X11 probablemente está instalado
+                 # y XWayland es útil para Sway.
+                 # Pero XWayland se instala como dependencia de sway si es necesario o se instala por separado.
+                 # Asumiremos que pacman maneja la dependencia de xorg-xwayland para sway si se instala.
+                 # Si no se instala X11, xorg-xwayland no se instalará, y Sway solo usará Wayland.
+                 # Este comportamiento ya está cubierto por la lógica de instalación de X11 arriba.
+                 # No necesitamos hacer nada adicional aquí para XWayland en este caso.
+                 echo -e "\033[33mSway instalado. XWayland se instalará si X11 está presente.\033[0m"
+            fi
+            ;;
+        8) # MATE (X11)
+            if [[ $(is_only_wayland "$desktop_choices") != "true" ]]; then
+                pacman -S --noconfirm --overwrite '*' mate mate-extra mate-media
+            else
+                echo -e "\033[33mOpción MATE (X11) omitida para instalación Wayland exclusiva.\033[0m"
+            fi
+            ;;
+        *) echo -e "\033[31mOpción $choice inválida, omitida.\033[0m" ;;
+    esac
+done
 
 echo -e "\033[32m==== REFRESH ====\033[0m"
 ./refresh
-
