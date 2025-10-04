@@ -1,0 +1,60 @@
+#!/usr/bin/bash
+set -euo pipefail
+trap 'echo -e "${RED}Error en línea $LINENO. Comando: $BASH_COMMAND${NC}"' ERR
+
+# Configurar colores
+RED='\033[31m'
+GREEN='\033[32m'
+YELLOW='\033[33m'
+BLUE='\033[34m'
+NC='\033[0m'
+
+echo -e "${GREEN}Instalando dependencias principales de Systemd_boot...${NC}"
+# ===== Detección automática del procesador =====
+detect_microcode() {
+    local vendor
+    vendor=$(grep -m1 -oP 'vendor_id\s*:\s*\K.*' /proc/cpuinfo | tr -d ' ')
+    
+    if [[ "$vendor" == *"GenuineIntel"* ]]; then
+        echo -e "\033[32mIntel detectado. Instalando intel-ucode\033[0m"
+        microcode="intel-ucode"
+    elif [[ "$vendor" == *"AuthenticAMD"* ]]; then
+        echo -e "\033[32mAMD detectado. Instalando amd-ucode\033[0m"
+        microcode="amd-ucode"
+    else
+        echo -e "\033[32mProcesador no reconocido. No se instalará microcódigo.\033[0m"
+        microcode=""
+    fi
+}
+
+# Llamar a la función de detección
+detect_microcode
+
+# Instalar microcódigo si se detectó
+if [[ -n "$microcode" ]]; then
+    pacman -S --needed --noconfirm --overwrite='*' "$microcode"
+fi
+
+#Instalar systemd-boot
+bootctl install
+
+echo -e "${GREEN}Crear archivo de configuración principal${NC}"
+
+echo "default arch.conf
+timeout 3
+console-mode keep
+editor no" > /boot/loader/loader.conf
+
+echo -e "${GREEN}Crear entrada de arranque${NC}"
+
+echo "title Arch Linux
+linux /vmlinuz-linux
+initrd /$microcode.img
+initrd /initramfs-linux.img
+options cryptdevice=UUID=<TU-UUID-AQUI>:cryptlvm root=/dev/vol01/root rw" > /boot/loader/entries/arch.conf
+
+mkinitcpio -P
+
+# Instalación de paquetes adicionales
+echo -e "${GREEN}==== EXTRAS ====${NC}"
+./extras

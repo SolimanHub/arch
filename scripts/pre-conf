@@ -9,7 +9,7 @@ NC='\033[0m'
 cp ./scripts/configs/* /mnt
 cp ./scripts/conf /mnt
 cp ./scripts/limpiar /mnt
-cp ./scripts/grub /mnt
+cp ./scripts/systemd_boot /mnt
 cp ./scripts/extras /mnt
 cp ./scripts/usuarios /mnt
 cp ./scripts/zsh /mnt

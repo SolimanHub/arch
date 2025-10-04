@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
+trap 'echo -e "${RED}Error en línea $LINENO. Comando: $BASH_COMMAND${NC}"' ERR
+
 # Configurar colores
 RED='\033[31m'
 GREEN='\033[32m'
@@ -10,24 +12,35 @@ hostname="temporalxyz"
 
 # Verificar que el archivo sudoers existe antes de moverlo
 if [ -e /sudoers ]; then
+    echo -e "${GREEN}Moviendo /sudoers a /etc/sudoers...${NC}"
     mv /sudoers /etc/
 else
-    echo "Advertencia: /sudoers no existe. Se omitirá el movimiento."
+    echo -e "${YELLOW}Advertencia: /sudoers no existe. Se omitirá el movimiento.${NC}"
 fi
 
 # Configuración de zona horaria
+echo -e "${GREEN}Estableciendo zona horaria a America/Tegucigalpa...${NC}"
 ln -sf /usr/share/zoneinfo/America/Tegucigalpa /etc/localtime
 
 # Configuración de locales
+echo -e "${GREEN}Configurando soporte de idioma y región (es_HN.UTF-8)...${NC}"
 echo "es_HN.UTF-8 UTF-8" >> /etc/locale.gen
 echo "LANG=es_HN.UTF-8" > /etc/locale.conf
 locale-gen
 
 # Sincronizar el reloj de hardware
+echo -e "${GREEN}Sincronizando reloj de hardware...${NC}"
 hwclock -w
 
-
+echo -e "${GREEN}Asignando hostname: ${YELLOW}$hostname${NC}"
 echo "$hostname" > /etc/hostname
+
+encriptado="esta_instalacion_es_con_disk_encryp"
+if [[ "$encriptado" == "true" ]]; then
+  echo -e "${GREEN}Configurar mkinitcpio"
+  sed -i '/^HOOKS=/ s/\(block\)/\1 sd-encrypt encrypt lvm2/' /etc/mkinitcpio.conf
+  mkinitcpio -P
+fi
 
 # Ejecutar configuración de usuarios
 echo -e "\033[32m==== USUARIOS ====\033[0m"

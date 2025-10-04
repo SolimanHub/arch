@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 set -e -u
+trap 'echo -e "${RED}Error en línea $LINENO. Comando: $BASH_COMMAND${NC}"' ERR
+
 # Configurar colores
 RED='\033[31m'
 GREEN='\033[32m'
@@ -10,16 +12,16 @@ readonly root_pass="tu_password_root"
 readonly user_pass="tu_password_usuario"
 readonly usuario="usuarioxyz"
 
+echo -e "${GREEN}Estableciendo contraseña del usuario root...${NC}"
 echo "root:$root_pass" | chpasswd
 
-echo "===== Crear usuario ====="
-#read -rp "Nombre de Usuario: " usuario
+echo -e "${YELLOW}===== Crear usuario =====${NC}"
 
+echo -e "${GREEN}Creando usuario '$usuario' con grupos y shell bash...${NC}"
 useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner -s /bin/bash "$usuario"
 
-echo "===== Crear contraseña para $usuario ====="
+echo -e "${YELLOW}===== Crear contraseña para ${usuario} =====${NC}"
 echo "$usuario:$user_pass" | chpasswd
 
-echo -e "\033[32m==== GRUB ====\033[0m"
-./grub
-
+echo -e "${GREEN}==== GESTOR DE ARRANQUE SYSTEM BOOT ====${NC}"
+./systemd_boot
