@@ -10,6 +10,7 @@ BLUE='\033[34m'
 NC='\033[0m'
 
 echo -e "${GREEN}Instalando dependencias principales de Systemd_boot...${NC}"
+
 # ===== Detección automática del procesador =====
 detect_microcode() {
     local vendor
@@ -35,29 +36,56 @@ if [[ -n "$microcode" ]]; then
     pacman -S --needed --noconfirm --overwrite='*' "$microcode"
 fi
 
+# Verificar si /boot está montado correctamente
+if ! mountpoint -q /boot; then
+    echo -e "${RED}Error: /boot no está montado correctamente${NC}"
+    exit 1
+fi
+
 #Instalar systemd-boot
 bootctl install
 
 #Restringiendo permisos
 chmod 700 /boot
-chmod 600 /boot/loader/random-seed
+chmod 600 /boot/loader/random-seed 2>/dev/null || true
 
 echo -e "${GREEN}Crear archivo de configuración principal${NC}"
 
 echo "default arch.conf
-timeout 1
+timeout 3
 console-mode keep
 editor no" > /boot/loader/loader.conf
 
 echo -e "${GREEN}Crear entrada de arranque${NC}"
 
-echo "title Arch Linux
+# Obtener UUID de la partición root
+ROOT_UUID=$(blkid -s UUID -o value /dev/disk/by-label/ARCH_ROOT 2>/dev/null || blkid -s UUID -o value $(findmnt -n -o SOURCE /))
+
+if [[ -z "$ROOT_UUID" ]]; then
+    echo -e "${RED}Error: No se pudo obtener el UUID de la partición root${NC}"
+    exit 1
+fi
+
+# Crear entrada para instalación SIN encriptación
+if [[ -n "$microcode" ]]; then
+    echo "title Arch Linux
 linux /vmlinuz-linux
 initrd /$microcode.img
 initrd /initramfs-linux.img
-options cryptdevice=UUID=<TU-UUID-AQUI>:cryptlvm root=/dev/vol01/root rw" > /boot/loader/entries/arch.conf
+options root=UUID=$ROOT_UUID rw" > /boot/loader/entries/arch.conf
+else
+    echo "title Arch Linux
+linux /vmlinuz-linux
+initrd /initramfs-linux.img
+options root=UUID=$ROOT_UUID rw" > /boot/loader/entries/arch.conf
+fi
 
 mkinitcpio -P
+
+# Remover GRUB si existe para evitar conflictos
+pacman -Rns grub efibootmgr --noconfirm 2>/dev/null || true
+
+echo -e "${GREEN}systemd-boot configurado correctamente${NC}"
 
 # Instalación de paquetes adicionales
 echo -e "${GREEN}==== EXTRAS ====${NC}"
