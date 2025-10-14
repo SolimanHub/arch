@@ -117,7 +117,7 @@ if [[ "$MINIMAL_INSTALL" == "s" ]]; then
         man-db man-pages texinfo pciutils usbutils \
         wpa_supplicant dialog htop \
         gvfs gvfs-afc gvfs-mtp \
-        networkmanager bluez blueberry bluez-utils 
+        networkmanager bluez blueman blueberry bluez-utils 
 
     # Detectar e instalar controladores gráficos
     detect_gpu_drivers
